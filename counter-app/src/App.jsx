@@ -3,26 +3,26 @@ import { useState } from 'react'
 import './App.css'
 
 function App() {
-  let [count, setcount] = useState(0)
+  const [count, setCount] = useState(0)
 
 
 
-  let addValues = () => {
-    setcount(count + 1)
+  const addValues = () => {
+    setCount(count + 1)
     console.log(count)
   }
 
-  let removeValues = () => {
-    setcount(count - 1)
+  const removeValues = () => {
+    setCount(count - 1)
     console.log(count)
   }
 
-  let restartValues = () => {
-    setcount(0)
+  const restartValues = () => {
+    setCount(0)
   }
 
   if (count < 0) {
-    setcount(0)
+    setCount(0)
   }
   return (
     <>
