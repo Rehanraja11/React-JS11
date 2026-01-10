@@ -10,12 +10,6 @@ function App() {
   const addValues = () => {
     setCount(count + 1)
 
-    setCount(prevcount => prevcount + 1)
-    setCount(prevcount => prevcount + 2)
-    setCount(prevcount => prevcount + 3)
-    setCount(prevcount => prevcount + 4)
-    setCount(prevcount => prevcount + 5)
-
   }
 
   const removeValues = () => {
