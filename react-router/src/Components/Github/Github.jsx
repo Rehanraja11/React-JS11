@@ -8,11 +8,13 @@ const Github = () => {
        .then(response => response.json())
        .then(data => {
         dataHandler(data)
+        
        })
     },[])
   return (
-    <div className='text-white text-center text-4xl bg-gray-600  p-10  rounded-4xl m-10 '>Github followers : {data.followers}
-    <img src={data.avatar_url} alt="picture" />
+    <div className='text-white text-center text-4xl bg-gray-600  p-15  rounded-4xl m-10 '>Github followers : {data.followers}
+    <h1 className='mt-3 bg-amber-900 p-5'>Github following : {data.following}</h1>
+    <img src={data.avatar_url} alt="picture" width={250} />
     
     </div>
   )
