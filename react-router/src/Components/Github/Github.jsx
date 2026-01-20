@@ -13,8 +13,8 @@ const Github = () => {
     },[])
   return (
     <div className='text-white text-center text-4xl bg-gray-600  p-15  rounded-4xl m-10 '>Github followers : {data.followers}
-    <h1 className='mt-3 bg-amber-900 p-5'>Github following : {data.following}</h1>
-    <img src={data.avatar_url} alt="picture" width={250} />
+    <h1>following : {data.following}</h1>
+    <img src={data.avatar_url} alt="picture" width={350} className='rounded-2xl m-7'  />
     
     </div>
   )
