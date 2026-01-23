@@ -7,7 +7,6 @@ const UserContextProvider = ({children})=>{
         <UserContext.Provider value={{user,setUser}}>
             {children}
         </UserContext.Provider>
-
     )
 }
 
