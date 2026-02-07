@@ -1,23 +1,23 @@
+import React from 'react'
+import { useEffect } from 'react'
 import { useState } from 'react'
 
-import './App.css'
-import { useEffect } from 'react'
-
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
+ 
+  const [count,conuterHandler] = useState(0)
 
   useEffect(()=>{
-      (`You Cliked ${count} ` )
-  },[count])
+    console.log(count)
+  })
+
 
   return (
-    <>
-     <h1>My Counter</h1>
-     <h2>Counter is :{count}</h2>
-      <button onClick={()=>setCount(count+1)}>Click Me</button>
-      <button onClick={()=>setCount(count-1)}>Don't Click</button>
-      
-    </>
+    <div>
+      <h1>Conter App</h1>
+      <h2>Conter is : {count} </h2>
+      <button onClick={()=>conuterHandler(count+1)}>Click</button>
+    </div>
+
   )
 }
 

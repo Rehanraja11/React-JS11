@@ -1,80 +1,76 @@
-import React, { createContext, useContext, useState } from 'react'
+import React, { createContext,  useContext,  useState } from 'react'
+
+
 const UserData = createContext()
 
 const App = () => {
-  const [user,userHandler] = useState("")
-  return (
-  <UserData.Provider  value={{user,userHandler}}>
-    <div>
-      <h1>Hey Context APi</h1>
-      <Components1/>
-    </div>
-  </UserData.Provider>
+  
+const [user,userHandler] = useState("")
 
+  return (
+    <UserData.Provider  value={{user,userHandler}}>
+     <h1>Hey How Are Uou</h1>
+     <Components1/>
+    </UserData.Provider>
   )
 }
+
 export default App
 
 
-const Components1 = () => {
+
+const Components1=() => {
   return (
     <div>
-      <h2>Components1</h2>
-       <Components2/>
+      <h1>Components1</h1>
+      <Components2/>
     </div>
   )
 }
 
-const Components2 = () => {
+const Components2=() => {
+  const {user} = useContext(UserData)
   return (
     <div>
-      <h2>Components2</h2>
-       <Components3/>
+      <h1>Components2 :{user }</h1>
+      <Components3/>
     </div>
   )
 }
 
 
-const Components3 = () => {
+const Components3=() => {
   return (
     <div>
-      <h2>Components3</h2>
+      <h1>Components3</h1>
       <Components4/>
     </div>
   )
 }
 
 
-
-const Components4 = () => {
+const Components4=() => {
   return (
     <div>
-      <h2>Components4</h2>
+      <h1>Components4</h1>
       <Components5/>
     </div>
   )
 }
-
-
-const Components5 = () => {
- 
-  const{user,userHandler} = useContext(UserData)
-
+const Components5=() => {
+  const {user,userHandler} = useContext(UserData)
   return (
     <div>
       <input 
       type="text"
+      placeholder='Enter Your Username'
       value={user}
-      placeholder='Enter Your Name'
       onChange={(e)=>userHandler(e.target.value)}
-       />
-      <h2>Components5 {user}</h2>
+      />
+
+      <h1>Components5 :{user}</h1>
     </div>
   )
 }
-
-
-
-
 
 
