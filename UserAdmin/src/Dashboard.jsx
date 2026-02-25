@@ -64,6 +64,8 @@ const Dashboard = () => {
       return hasUpper && hasLower && hasNumber && hasSpecial;
     };
 
+
+
     if (isDuplicateEmail) {
       alert("Email already exists!");
       return;
@@ -84,6 +86,11 @@ const Dashboard = () => {
       return;
     }
 
+    if (form.number.length !== 10) {
+      alert("Number must be exactly 10 digits!");
+      return;
+    }
+
     if (!validatePassword(form.password)) {
       alert(
         "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character!",
@@ -97,11 +104,6 @@ const Dashboard = () => {
       setUsers([...users, { ...form, id: Date.now() }]);
     }
 
-    if (form.number.length !== 10) {
-      alert("Number must be exactly 10 digits!");
-      return;
-    }
-
     setForm({
       id: null,
       name: "",
@@ -112,7 +114,6 @@ const Dashboard = () => {
 
     dialog.close();
   };
-
   const handleNumberChange = (e) => {
     const value = e.target.value.replace(/\D/g, "").slice(0, 10);
     setForm({ ...form, number: value });
