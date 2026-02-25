@@ -1,0 +1,289 @@
+import React, { useState, useEffect } from "react";
+import "./App.css";
+import Header from "./Header";
+
+const Dashboard = () => {
+  const [users, setUsers] = useState(
+    JSON.parse(localStorage.getItem("users")) || [],
+  );
+
+  const [form, setForm] = useState({
+    id: null,
+    name: "",
+    email: "",
+    password: "",
+    number: "",
+  });
+
+  useEffect(() => {
+    localStorage.setItem("users", JSON.stringify(users));
+  }, [users]);
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const dialog = document.getElementById("demo-dialog-form");
+
+    const isDuplicateNumber = users.some(
+      (u) => u.number === form.number && u.id !== form.id,
+    );
+
+    const isDuplicateEmail = users.some(
+      (u) => u.email === form.email && u.id !== form.id,
+    );
+
+    const isDuplicatePass = users.some(
+      (u) => u.password === form.password && u.id !== form.id,
+    );
+
+    const isDuplicateName = users.some(
+      (u) => u.name === form.name && u.id !== form.id,
+    );
+
+    const validatePassword = (password) => {
+      if (password.length < 8) return false;
+
+      let hasUpper = false;
+      let hasLower = false;
+      let hasNumber = false;
+      let hasSpecial = false;
+
+      for (let i = 0; i < password.length; i++) {
+        let char = password[i];
+
+        if (char >= "A" && char <= "Z") hasUpper = true;
+        else if (char >= "a" && char <= "z") hasLower = true;
+        else if (char >= "0" && char <= "9") hasNumber = true;
+        else hasSpecial = true;
+      }
+
+      return hasUpper && hasLower && hasNumber && hasSpecial;
+    };
+
+    if (isDuplicateEmail) {
+      alert("Email already exists!");
+      return;
+    }
+
+    if (isDuplicateNumber) {
+      alert("Number already exists!");
+      return;
+    }
+
+    if (isDuplicatePass) {
+      alert("Password already exists!");
+      return;
+    }
+
+    if (isDuplicateName) {
+      alert("Name already exists!");
+      return;
+    }
+
+    if (!validatePassword(form.password)) {
+      alert(
+        "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character!",
+      );
+      return;
+    }
+
+    if (form.id) {
+      setUsers(users.map((u) => (u.id === form.id ? form : u)));
+    } else {
+      setUsers([...users, { ...form, id: Date.now() }]);
+    }
+
+    if (form.number.length !== 10) {
+      alert("Number must be exactly 10 digits!");
+      return;
+    }
+
+    setForm({
+      id: null,
+      name: "",
+      email: "",
+      password: "",
+      number: "",
+    });
+
+    dialog.close();
+  };
+
+  const handleNumberChange = (e) => {
+    const value = e.target.value.replace(/\D/g, "").slice(0, 10);
+    setForm({ ...form, number: value });
+  };
+
+  const handleDelete = (id) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this user?",
+    );
+
+    if (confirmDelete) {
+      setUsers(users.filter((u) => u.id !== id));
+    }
+  };
+
+  const handleEdit = (user) => {
+    setForm(user);
+
+    const dialog = document.getElementById("demo-dialog-form");
+    dialog.showModal();
+  };
+
+  return (
+    <>
+      <Header />
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "10vh",
+          backgroundColor: "#f5f5f5",
+        }}
+      >
+        <button
+          commandfor="demo-dialog-form"
+          command="show-modal"
+          style={{
+            background: "linear-gradient(135deg, #000000, #333333)",
+            color: "#ffffff",
+            padding: "12px 28px",
+            borderRadius: "8px",
+            border: "none",
+            fontSize: "16px",
+            fontWeight: "600",
+            cursor: "pointer",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+            transition: "all 0.3s ease",
+          }}
+        >
+          Add Users
+        </button>
+      </div>
+      <dialog id="demo-dialog-form" onSubmit={handleSubmit}>
+        <form method="dialog">
+          <header>
+            <h3>Add</h3>
+          </header>
+          <div>
+            <label>
+              Name{" "}
+              <input
+                type="text"
+                name="name"
+                placeholder="Name"
+                value={form.name}
+                onChange={handleChange}
+                required
+              />
+            </label>
+
+            <label>
+              Email{" "}
+              <input
+                type="email"
+                name="email"
+                placeholder="Email"
+                value={form.email}
+                onChange={handleChange}
+                required
+              />
+            </label>
+
+            <label>
+              Password{" "}
+              <input
+                type="password"
+                name="password"
+                placeholder="Password"
+                value={form.password}
+                onChange={handleChange}
+                required
+              />
+            </label>
+
+            <label>
+              Number
+              <input
+                type="tel"
+                name="number"
+                placeholder="Number"
+                value={form.number}
+                onChange={handleNumberChange}
+                maxLength="10"
+                required
+              />
+            </label>
+          </div>
+          <footer>
+            <button
+              type="button"
+              commandfor="demo-dialog-form"
+              command="close"
+              class="outline"
+            >
+              Cancel
+            </button>
+
+            <button value="save" type="submit">
+              {form.id ? "Update User" : "Add User"}
+            </button>
+          </footer>
+        </form>
+      </dialog>
+
+      <h3 style={{ textAlign: "center" }}>User List</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Password</th>
+            <th>Number</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {users.map((user) => (
+            <tr key={user.id}>
+              <td>{user.name}</td>
+              <td>{user.email}</td>
+              <td>{user.password}</td>
+              <td>{user.number}</td>
+              <td>
+                <button
+                  onClick={() => handleEdit(user)}
+                  style={{
+                    background: "Green",
+                    padding: "8px 18px",
+                    fontSize: "18px",
+                  }}
+                >
+                  Edit
+                </button>{" "}
+                <button
+                  onClick={() => handleDelete(user.id)}
+                  style={{
+                    background: "brown",
+                    padding: "8px 18px",
+                    fontSize: "18px",
+                  }}
+                >
+                  Delete
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </>
+  );
+};
+export default Dashboard;
