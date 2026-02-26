@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
 import Header from "./Header";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const Dashboard = () => {
   const [users, setUsers] = useState(
     JSON.parse(localStorage.getItem("users")) || [],
   );
+
+  const [showPassword, setShowPassword] = useState({});
+  const [deleteUser, setDeleteUser] = useState(null);
 
   const [form, setForm] = useState({
     id: null,
@@ -14,6 +18,21 @@ const Dashboard = () => {
     password: "",
     number: "",
   });
+
+  const togglePassword = (id) => {
+    setShowPassword((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
+
+  const confirmDeleteUser = () => {
+    setUsers(users.filter((u) => u.id !== deleteUser.id));
+    setDeleteUser(null);
+
+    const dialog = document.getElementById("delete-dialog");
+    dialog.close();
+  };
 
   useEffect(() => {
     localStorage.setItem("users", JSON.stringify(users));
@@ -54,7 +73,6 @@ const Dashboard = () => {
 
       for (let i = 0; i < password.length; i++) {
         let char = password[i];
-
         if (char >= "A" && char <= "Z") hasUpper = true;
         else if (char >= "a" && char <= "z") hasLower = true;
         else if (char >= "0" && char <= "9") hasNumber = true;
@@ -63,8 +81,6 @@ const Dashboard = () => {
 
       return hasUpper && hasLower && hasNumber && hasSpecial;
     };
-
-
 
     if (isDuplicateEmail) {
       alert("Email already exists!");
@@ -103,7 +119,6 @@ const Dashboard = () => {
     } else {
       setUsers([...users, { ...form, id: Date.now() }]);
     }
-
     setForm({
       id: null,
       name: "",
@@ -111,7 +126,6 @@ const Dashboard = () => {
       password: "",
       number: "",
     });
-
     dialog.close();
   };
   const handleNumberChange = (e) => {
@@ -119,16 +133,11 @@ const Dashboard = () => {
     setForm({ ...form, number: value });
   };
 
-  const handleDelete = (id) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this user?",
-    );
-
-    if (confirmDelete) {
-      setUsers(users.filter((u) => u.id !== id));
-    }
+  const handleDelete = (user) => {
+    setDeleteUser(user);
+    const dialog = document.getElementById("delete-dialog");
+    dialog.showModal();
   };
-
   const handleEdit = (user) => {
     setForm(user);
 
@@ -256,7 +265,20 @@ const Dashboard = () => {
             <tr key={user.id}>
               <td>{user.name}</td>
               <td>{user.email}</td>
-              <td>{user.password}</td>
+              <td style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                {showPassword[user.id] ? user.password : "••••••••"}
+
+                <span
+                  onClick={() => togglePassword(user.id)}
+                  style={{
+                    cursor: "pointer",
+                    fontSize: "18px",
+                    color: "#333",
+                  }}
+                >
+                  {showPassword[user.id] ? <FaEyeSlash /> : <FaEye />}
+                </span>
+              </td>
               <td>{user.number}</td>
               <td>
                 <button
@@ -270,7 +292,7 @@ const Dashboard = () => {
                   Edit
                 </button>{" "}
                 <button
-                  onClick={() => handleDelete(user.id)}
+                  onClick={() => handleDelete(user)}
                   style={{
                     background: "brown",
                     padding: "8px 18px",
@@ -284,6 +306,44 @@ const Dashboard = () => {
           ))}
         </tbody>
       </table>
+
+      <dialog id="delete-dialog">
+        <div style={{ padding: "20px", minWidth: "300px" }}>
+          <h3>Delete User</h3>
+          <p>
+            Are you sure you want to delete <b>{deleteUser?.name}</b>?
+          </p>
+
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              marginTop: "20px",
+            }}
+          >
+            <button
+              onClick={() => {
+                document.getElementById("delete-dialog").close();
+                setDeleteUser(null);
+              }}
+              className="outline"
+            >
+              Cancel
+            </button>
+
+            <button
+              onClick={confirmDeleteUser}
+              style={{
+                background: "red",
+                color: "white",
+                padding: "8px 16px",
+              }}
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      </dialog>
     </>
   );
 };

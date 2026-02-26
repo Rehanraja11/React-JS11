@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "./Context/AuthContext.jsx";
 import Header from "./Header.jsx";
 
+
 const Login = () => {
   // const [email, setEmail] = useState("");
   // const [password, setPassword] = useState("");
@@ -41,10 +42,11 @@ const Login = () => {
         onSubmit={handleLogin}
         style={{
           padding: "20px",
-          margin: "300px",
+          margin: "200px",
           width: "550px",
           borderRadius:"11px",
-          marginLeft: "700px",
+          marginLeft: "630px",
+          marginTop: "300px",
         }}
       >
         <h2 style={{ textAlign: "center" }}>Login</h2>
@@ -56,12 +58,15 @@ const Login = () => {
         />
         <br />
         <br />
+        
         <input
           type="password"
           placeholder="Password"
           onChange={(e) => setPassword(e.target.value)}
           required
         />
+
+        
         <br />
         <br />
         <button type="submit">Login</button>
