@@ -7,7 +7,6 @@ const Dashboard = () => {
   const [users, setUsers] = useState(
     JSON.parse(localStorage.getItem("users")) || [],
   );
-
   const [showPassword, setShowPassword] = useState({});
   const [deleteUser, setDeleteUser] = useState(null);
 
@@ -155,7 +154,6 @@ const Dashboard = () => {
     const dialog = document.getElementById("demo-dialog-form");
     dialog.showModal();
   };
-
   return (
     <>
       <Header />
@@ -232,7 +230,7 @@ const Dashboard = () => {
             <label>
               Number
               <input
-                type="tel"
+                type="tel"  
                 name="number"
                 placeholder="Number"
                 value={form.number}
@@ -260,7 +258,6 @@ const Dashboard = () => {
       </dialog>
 
       <h3 style={{ textAlign: "center" }}>User List</h3>
-
       <table>
         <thead>
           <tr>
