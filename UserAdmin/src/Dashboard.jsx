@@ -19,6 +19,17 @@ const Dashboard = () => {
     number: "",
   });
 
+  const handleCopyPassword = (password) => {
+    navigator.clipboard
+      .writeText(password)
+      .then(() => {
+        alert("Password copied to clipboard!");
+      })
+      .catch(() => {
+        alert("Failed to copy password.");
+      });
+  };
+
   const togglePassword = (id) => {
     setShowPassword((prev) => ({
       ...prev,
@@ -257,7 +268,7 @@ const Dashboard = () => {
             <th>Email</th>
             <th>Password</th>
             <th>Number</th>
-            <th>Action</th>
+            <th>Action</th> 
           </tr>
         </thead>
         <tbody>
@@ -278,6 +289,20 @@ const Dashboard = () => {
                 >
                   {showPassword[user.id] ? <FaEyeSlash /> : <FaEye />}
                 </span>
+
+                <button
+                  onClick={() => handleCopyPassword(user.password)}
+                  style={{
+                    padding: "4px 10px",
+                    fontSize: "12px",
+                    cursor: "pointer",
+                    borderRadius: "4px",
+                    border: "1px solid #ccc",
+                    background: "black",
+                  }}
+                >
+                  Copy
+                </button>
               </td>
               <td>{user.number}</td>
               <td>
