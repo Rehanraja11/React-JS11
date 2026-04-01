@@ -35,7 +35,6 @@ const Login = () => {
       alert("Invalid credentials!");
     }
   };
-
   return (
     <>
       <form
@@ -58,15 +57,12 @@ const Login = () => {
         />
         <br />
         <br />
-        
         <input
           type="password"
           placeholder="Password"
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-
-        
         <br />
         <br />
         <button type="submit">Login</button>
