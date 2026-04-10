@@ -5,7 +5,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem 2rem;
-  background-color: #333;
+  background-color: #120325;
+  border-bottom: 1px solid white;
   color: white;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -53,3 +54,36 @@ form {
 }
 
 
+.main-container {
+  display: flex;
+  height: 100vh;
+}
+
+.dashboard-content {
+  flex: 1;
+  padding: 20px;
+  background: #f5f5f5;
+}
+
+.top-bar {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+.add-user-btn {
+  padding: 10px 20px;
+  background: black;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+table {
+  width: 90%;
+  background: white;
+  border-collapse: collapse;
+}
+
+.logoutbtn:hover {
+  background-color: #0d0f11;
+  color: #fff;
+}

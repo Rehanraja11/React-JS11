@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "./Context/AuthContext.jsx";
 import Header from "./Header.jsx";
 
-
 const Login = () => {
   // const [email, setEmail] = useState("");
   // const [password, setPassword] = useState("");
@@ -12,23 +11,19 @@ const Login = () => {
 
   const handleLogin = (e) => {
     e.preventDefault();
-
-    //  if (email === "rehann@gmail.com" && password === "11") {
-    //   navigate("/dashboard");
-
-    // } else {
-    //   alert("Invalid Credentials");
-    // }
-
     const users = JSON.parse(localStorage.getItem("users")) || [];
+    const students = JSON.parse(localStorage.getItem("students")) || [];
 
     const validUser = users.find(
+      (u) => u.email === email && u.password === password,
+    );
+    const validStudent = students.find(
       (u) => u.email === email && u.password === password,
     );
 
     const admin = email === "rehann@gmail.com" && password === "11";
 
-    if (validUser || admin) {
+    if (validUser || admin || validStudent) {
       localStorage.setItem("loggedInUser", JSON.stringify(validUser));
       navigate("/dashboard");
     } else {
@@ -46,6 +41,7 @@ const Login = () => {
           borderRadius:"11px",
           marginLeft: "630px",
           marginTop: "300px",
+
         }}
       >
         <h2 style={{ textAlign: "center" }}>Login</h2>

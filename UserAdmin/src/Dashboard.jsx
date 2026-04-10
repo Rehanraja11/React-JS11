@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
-import Header from "./Header";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-
+import { IoMdCopy } from "react-icons/io";
+import { FaRegEdit } from "react-icons/fa";
+import { MdDelete } from "react-icons/md";
+import DefaultLayout from "./layout/DefaultLayout";
+import { PiStudentThin } from "react-icons/pi";
+import { MdDashboard } from "react-icons/md";
 const Dashboard = () => {
   const [users, setUsers] = useState(
     JSON.parse(localStorage.getItem("users")) || [],
@@ -25,7 +29,7 @@ const Dashboard = () => {
         alert("Password copied to clipboard!");
       })
       .catch(() => {
-        alert("Failed to copy password.");
+        alert("Failed to copy password."); 
       });
   };
 
@@ -155,15 +159,12 @@ const Dashboard = () => {
     dialog.showModal();
   };
   return (
-    <>
-      <Header />
+    <DefaultLayout>
       <div
         style={{
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          height: "10vh",
-          backgroundColor: "#f5f5f5",
         }}
       >
         <button
@@ -180,9 +181,10 @@ const Dashboard = () => {
             cursor: "pointer",
             boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
             transition: "all 0.3s ease",
+            marginTop: "20px",
           }}
         >
-          Add Users
+          Add Users <MdDashboard />
         </button>
       </div>
       <dialog id="demo-dialog-form" onSubmit={handleSubmit}>
@@ -202,7 +204,6 @@ const Dashboard = () => {
                 required
               />
             </label>
-
             <label>
               Email{" "}
               <input
@@ -214,7 +215,6 @@ const Dashboard = () => {
                 required
               />
             </label>
-
             <label>
               Password{" "}
               <input
@@ -226,11 +226,10 @@ const Dashboard = () => {
                 required
               />
             </label>
-
             <label>
               Number
               <input
-                type="tel"  
+                type="tel"
                 name="number"
                 placeholder="Number"
                 value={form.number}
@@ -249,14 +248,12 @@ const Dashboard = () => {
             >
               Cancel
             </button>
-
             <button value="save" type="submit">
               {form.id ? "Update User" : "Add User"}
             </button>
           </footer>
         </form>
       </dialog>
-
       <h3 style={{ textAlign: "center" }}>User List</h3>
       <table>
         <thead>
@@ -265,41 +262,37 @@ const Dashboard = () => {
             <th>Email</th>
             <th>Password</th>
             <th>Number</th>
-            <th>Action</th> 
+            <th>Action</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody style={{}}>
           {users.map((user) => (
             <tr key={user.id}>
               <td>{user.name}</td>
               <td>{user.email}</td>
-              <td style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <td style={{ display: "flex", alignItems: "center" }}>
                 {showPassword[user.id] ? user.password : "••••••••"}
-
                 <span
                   onClick={() => togglePassword(user.id)}
                   style={{
                     cursor: "pointer",
                     fontSize: "18px",
                     color: "#333",
+                    marginLeft:"5px"
                   }}
                 >
                   {showPassword[user.id] ? <FaEyeSlash /> : <FaEye />}
                 </span>
-
                 <button
                   onClick={() => handleCopyPassword(user.password)}
                   style={{
-                    padding: "4px 10px",
-                    fontSize: "12px",
-                    cursor: "pointer",
-                    borderRadius: "4px",
-                    border: "1px solid #ccc",
                     background: "black",
+                    padding: "5px 20px",
+                    marginLeft: "10px",
                   }}
                 >
-                  Copy
-                </button>
+                  <IoMdCopy />
+                  </button>
               </td>
               <td>{user.number}</td>
               <td>
@@ -307,21 +300,21 @@ const Dashboard = () => {
                   onClick={() => handleEdit(user)}
                   style={{
                     background: "Green",
-                    padding: "8px 18px",
+                    padding: "6px 18px",
                     fontSize: "18px",
                   }}
                 >
-                  Edit
+                  <FaRegEdit />
                 </button>{" "}
                 <button
                   onClick={() => handleDelete(user)}
                   style={{
                     background: "brown",
-                    padding: "8px 18px",
+                    padding: "6px 18px",
                     fontSize: "18px",
                   }}
                 >
-                  Delete
+                  <MdDelete />
                 </button>
               </td>
             </tr>
@@ -335,7 +328,6 @@ const Dashboard = () => {
           <p>
             Are you sure you want to delete <b>{deleteUser?.name}</b>?
           </p>
-
           <div
             style={{
               display: "flex",
@@ -353,20 +345,11 @@ const Dashboard = () => {
               Cancel
             </button>
 
-            <button
-              onClick={confirmDeleteUser}
-              style={{
-                background: "red",
-                color: "white",
-                padding: "8px 16px",
-              }}
-            >
-              Delete
-            </button>
+            <button onClick={confirmDeleteUser}>Delete</button>
           </div>
         </div>
       </dialog>
-    </>
+    </DefaultLayout>
   );
 };
 export default Dashboard;
