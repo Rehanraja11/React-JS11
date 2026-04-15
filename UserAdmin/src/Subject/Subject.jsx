@@ -120,7 +120,7 @@ const Subject = () => {
       <div className="flex mt-15 mb-12">
         <h3 style={{ fontWeight: "600" }} className="mr-310">
           {" "}
-          User List
+          Subject List
         </h3>
         <button
           onClick={() => document.getElementById("subject-dialog").showModal()}

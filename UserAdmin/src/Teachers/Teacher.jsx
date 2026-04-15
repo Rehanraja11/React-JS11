@@ -193,7 +193,7 @@ const Teacher = () => {
       <div className="flex mt-15 mb-12">
         <h3 style={{ fontWeight: "600" }} className="mr-310">
           {" "}
-          User List
+          Teacher List
         </h3>
         <button
           onClick={() => document.getElementById("teacher-dialog").showModal()}

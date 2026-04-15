@@ -26,6 +26,7 @@ const Student = () => {
     address: "",
   });
   const [errors, setErrors] = useState(" ");
+  const [numberErrors, setNumberErrors] = useState(" ");
 
   useEffect(() => {
     localStorage.setItem("students", JSON.stringify(students));
@@ -86,7 +87,7 @@ const Student = () => {
       alert("Duplicate data found!");
       return;
     }
-
+    
     if (!validatePassword(form.password)) {
       setErrors(
         { ...errors, password: "Week Password" }
