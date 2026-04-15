@@ -1,7 +1,6 @@
 import { createContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-export const AuthContext = createContext();
+ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [email, setEmail] = useState("");
@@ -21,3 +20,5 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
+
+export default AuthContext
