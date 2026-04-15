@@ -77,15 +77,12 @@ const Subject = () => {
 
   return (
     <DefaultLayout>
-     
-
       <dialog id="subject-dialog" style={{ padding: "20px" }}>
         <form
           style={{ padding: "20px", background: "#fff" }}
           onSubmit={handleSubmit}
         >
           <h3>{form.id ? "Edit Subject" : "Add Subject"}</h3>
-
           <label>Subject Name</label>
           <input
             type="text"
@@ -94,7 +91,6 @@ const Subject = () => {
             onChange={handleChange}
             required
           />
-
           <label>Semester</label>
           <input
             type="text"
@@ -103,7 +99,6 @@ const Subject = () => {
             onChange={handleChange}
             required
           />
-
           <label>Instructor</label>
           <input
             type="text"
@@ -122,7 +117,6 @@ const Subject = () => {
           </button>
         </form>
       </dialog>
-
       <div className="flex mt-15 mb-12">
         <h3 style={{ fontWeight: "600" }} className="mr-310">
           {" "}
@@ -146,7 +140,6 @@ const Subject = () => {
            Add Subject <IoBookSharp />  
         </button>
       </div>
-
       <table>
         <thead>
           <tr>
@@ -156,14 +149,12 @@ const Subject = () => {
             <th style={myStyle}>Action</th>
           </tr>
         </thead>
-
         <tbody>
           {subjects.map((s) => (
             <tr key={s.id}>
               <td>{s.subjectName}</td>
               <td>{s.semester}</td>
               <td>{s.instructor}</td>
-
               <td>
                 <button
                   onClick={() => handleEdit(s)}
