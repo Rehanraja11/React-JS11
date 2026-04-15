@@ -6,8 +6,6 @@ import { MdDelete } from "react-icons/md";
 import DefaultLayout from "../layout/DefaultLayout";
 import { GiTeacher } from "react-icons/gi";
 
-
-
 const Teacher = () => {
   const [teachers, setTeachers] = useState(
     JSON.parse(localStorage.getItem("teachers")) || [],
@@ -127,28 +125,6 @@ const Teacher = () => {
 
   return (
     <DefaultLayout>
-      <div style={{ textAlign: "center" }}>
-        <button
-          onClick={() => document.getElementById("teacher-dialog").showModal()}
-          style={{
-            background: "linear-gradient(135deg, #000000, #333333)",
-            color: "#ffffff",
-            padding: "12px 28px",
-            borderRadius: "8px",
-            border: "none",
-            fontSize: "16px",
-            fontWeight: "600",
-            cursor: "pointer",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
-            transition: "all 0.3s ease",
-            marginTop: "20px",
-          }}
-        >
-          Add Teacher's <GiTeacher />
-
-        </button>
-      </div>
-
       <dialog id="teacher-dialog" style={{ padding: "20px" }}>
         <form
           style={{ padding: "20px", background: "#fff" }}
@@ -205,6 +181,7 @@ const Teacher = () => {
 
           <button type="submit">{form.id ? "Update" : "Add"}</button>
           <button
+            style={{ marginLeft: "292px" }}
             type="button"
             onClick={() => document.getElementById("teacher-dialog").close()}
           >
@@ -213,7 +190,30 @@ const Teacher = () => {
         </form>
       </dialog>
 
-      <h3 style={{ textAlign: "center", fontWeight: "bold" }}>Teacher List</h3>
+      <div className="flex mt-15 mb-12">
+        <h3 style={{ fontWeight: "600" }} className="mr-310">
+          {" "}
+          User List
+        </h3>
+        <button
+          onClick={() => document.getElementById("teacher-dialog").showModal()}
+          style={{
+            background: "linear-gradient(135deg, #000000, #333333)",
+            color: "#ffffff",
+            padding: "12px 22px",
+            borderRadius: "8px",
+            border: "none",
+            fontSize: "16px",
+            fontWeight: "600",
+            cursor: "pointer",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+            transition: "all 0.3s ease",
+          }}
+        >
+          Add Teachers
+          <GiTeacher />
+        </button>
+      </div>
 
       <table>
         <thead>
@@ -239,7 +239,7 @@ const Teacher = () => {
                     cursor: "pointer",
                     fontSize: "18px",
                     color: "#333",
-                    marginLeft:"5px"
+                    marginLeft: "5px",
                   }}
                   onClick={() => togglePassword(t.id)}
                 >

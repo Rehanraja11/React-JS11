@@ -6,28 +6,18 @@ import "@knadh/oat/oat.min.js";
 import Student from "./Student/Student.jsx";
 import Teacher from "./Teachers/Teacher.jsx";
 import Subject from "./Subject/Subject.jsx";
+import ProtectedRoute from "./ProtectedRoute.jsx";
+
 
 function App() {
   return (
-  
-      
         <Routes>
           <Route path="/" element={<Login />} />
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="/student" element={<Student />} />
-          <Route path="/teacher" element={<Teacher/>} />
-          <Route path="/subject" element={<Subject/>} />
-        </Routes>
-     
-   
-  );
+          <Route path="dashboard" element={<ProtectedRoute><Dashboard/></ProtectedRoute>} />
+          <Route path="/student" element={<ProtectedRoute><Student/></ProtectedRoute>} />
+          <Route path="/teacher" element={<ProtectedRoute><Teacher/></ProtectedRoute>} />
+          <Route path="/subject" element={<ProtectedRoute><Subject/></ProtectedRoute>} />
+        </Routes>  
+        );
 }
 export default App;
-
-// const ProtectedRoutes = ({ children }) => {
-//   const { email } = useContext(AuthContext);
-//   if (!email) {
-//     return <Navigate to="/" replace />;
-//   }
-//   return children;
-// };

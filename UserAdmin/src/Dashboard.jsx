@@ -5,8 +5,8 @@ import { IoMdCopy } from "react-icons/io";
 import { FaRegEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import DefaultLayout from "./layout/DefaultLayout";
-import { PiStudentThin } from "react-icons/pi";
 import { MdDashboard } from "react-icons/md";
+
 const Dashboard = () => {
   const [users, setUsers] = useState(
     JSON.parse(localStorage.getItem("users")) || [],
@@ -87,7 +87,7 @@ const Dashboard = () => {
 
       for (let i = 0; i < password.length; i++) {
         let char = password[i];
-        if (char >= "A" && char <= "Z") hasUpper = true;
+        if (char >= "A" && char <= "Z") hasUpper = true;  
         else if (char >= "a" && char <= "z") hasLower = true;
         else if (char >= "0" && char <= "9") hasNumber = true;
         else hasSpecial = true;
@@ -167,25 +167,7 @@ const Dashboard = () => {
           alignItems: "center",
         }}
       >
-        <button
-          commandfor="demo-dialog-form"
-          command="show-modal"
-          style={{
-            background: "linear-gradient(135deg, #000000, #333333)",
-            color: "#ffffff",
-            padding: "12px 28px",
-            borderRadius: "8px",
-            border: "none",
-            fontSize: "16px",
-            fontWeight: "600",
-            cursor: "pointer",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
-            transition: "all 0.3s ease",
-            marginTop: "20px",
-          }}
-        >
-          Add Users <MdDashboard />
-        </button>
+       
       </div>
       <dialog id="demo-dialog-form" onSubmit={handleSubmit}>
         <form method="dialog">
@@ -193,8 +175,8 @@ const Dashboard = () => {
             <h3>Add</h3>
           </header>
           <div>
-            <label>
-              Name{" "}
+           
+             
               <input
                 type="text"
                 name="name"
@@ -203,9 +185,8 @@ const Dashboard = () => {
                 onChange={handleChange}
                 required
               />
-            </label>
-            <label>
-              Email{" "}
+           
+            
               <input
                 type="email"
                 name="email"
@@ -214,9 +195,7 @@ const Dashboard = () => {
                 onChange={handleChange}
                 required
               />
-            </label>
-            <label>
-              Password{" "}
+              
               <input
                 type="password"
                 name="password"
@@ -225,9 +204,8 @@ const Dashboard = () => {
                 onChange={handleChange}
                 required
               />
-            </label>
-            <label>
-              Number
+            
+              
               <input
                 type="tel"
                 name="number"
@@ -237,7 +215,7 @@ const Dashboard = () => {
                 maxLength="10"
                 required
               />
-            </label>
+            
           </div>
           <footer>
             <button
@@ -254,15 +232,38 @@ const Dashboard = () => {
           </footer>
         </form>
       </dialog>
-      <h3 style={{ textAlign: "center" }}>User List</h3>
+      <div className="flex mt-15 mb-12">
+
+      <h3 style={{fontWeight:"600"}} className="mr-310"> User List</h3>
+       <button
+          commandfor="demo-dialog-form"
+          command="show-modal"
+          style={{
+            background: "linear-gradient(135deg, #000000, #333333)",
+            color: "#ffffff",
+            padding: "12px 22px",
+            borderRadius: "8px",
+            border: "none",
+            fontSize: "16px",
+            fontWeight: "600",
+            cursor: "pointer",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+            transition: "all 0.3s ease",
+            
+          }}
+        >
+          Add Users <MdDashboard />
+        </button>
+      </div>
+      
       <table>
         <thead>
           <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Password</th>
-            <th>Number</th>
-            <th>Action</th>
+            <th style={myStyle}>Name</th>
+            <th style={myStyle}>Email</th>
+            <th style={myStyle}>Password</th>
+            <th style={myStyle}>Number</th>
+            <th style={myStyle}>Action</th>
           </tr>
         </thead>
         <tbody style={{}}>
@@ -352,4 +353,5 @@ const Dashboard = () => {
     </DefaultLayout>
   );
 };
+const myStyle = { color: "Gray", fontWeight: "550" };
 export default Dashboard;
