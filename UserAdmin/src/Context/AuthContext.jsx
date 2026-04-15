@@ -11,7 +11,6 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("isAuth");
     navigate("/", { replace: true });
   };
-
   return (
     <AuthContext.Provider
       value={{ email, setEmail, password, setPassword, logout }}
