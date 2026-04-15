@@ -25,6 +25,7 @@ const Student = () => {
     dob: "",
     address: "",
   });
+  const [errors, setErrors] = useState(" ");
 
   useEffect(() => {
     localStorage.setItem("students", JSON.stringify(students));
@@ -87,7 +88,9 @@ const Student = () => {
     }
 
     if (!validatePassword(form.password)) {
-      alert("Weak password!");
+      setErrors(
+        { ...errors, password: "Week Password" }
+      );
       return;
     }
 
@@ -156,6 +159,7 @@ const Student = () => {
             onChange={handleChange}
             required
           />
+          {errors.password && <span style={{ color: "red", }}>{errors.password}</span>}
           <input
             type="tel"
             name="Number"

@@ -7,6 +7,7 @@ import Student from "./Student/Student.jsx";
 import Teacher from "./Teachers/Teacher.jsx";
 import Subject from "./Subject/Subject.jsx";
 import ProtectedRoute from "./ProtectedRoute.jsx";
+import Class from "./Class/Class.jsx";
 
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
           <Route path="/student" element={<ProtectedRoute><Student/></ProtectedRoute>} />
           <Route path="/teacher" element={<ProtectedRoute><Teacher/></ProtectedRoute>} />
           <Route path="/subject" element={<ProtectedRoute><Subject/></ProtectedRoute>} />
+          <Route path="/class" element={<ProtectedRoute><Class/></ProtectedRoute>} />
         </Routes>  
         );
 }

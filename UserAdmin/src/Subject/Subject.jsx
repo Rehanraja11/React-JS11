@@ -74,6 +74,7 @@ const Subject = () => {
     document.getElementById("delete-subject-dialog").close();
   };
 
+
   return (
     <DefaultLayout>
      

@@ -22,6 +22,13 @@ const Dashboard = () => {
     number: "",
   });
 
+  const [errors, setErrors] = useState({
+    name: "",
+    email: "",
+    password: "",
+    number: "",
+  });
+
   const handleCopyPassword = (password) => {
     navigator.clipboard
       .writeText(password)
@@ -29,7 +36,7 @@ const Dashboard = () => {
         alert("Password copied to clipboard!");
       })
       .catch(() => {
-        alert("Failed to copy password."); 
+        alert("Failed to copy password.");
       });
   };
 
@@ -61,6 +68,13 @@ const Dashboard = () => {
 
     const dialog = document.getElementById("demo-dialog-form");
 
+    let newErrors = {
+      name: "",
+      email: "",
+      password: "",
+      number: "",
+    };
+
     const isDuplicateNumber = users.some(
       (u) => u.number === form.number && u.id !== form.id,
     );
@@ -85,9 +99,8 @@ const Dashboard = () => {
       let hasNumber = false;
       let hasSpecial = false;
 
-      for (let i = 0; i < password.length; i++) {
-        let char = password[i];
-        if (char >= "A" && char <= "Z") hasUpper = true;  
+      for (let char of password) {
+        if (char >= "A" && char <= "Z") hasUpper = true;
         else if (char >= "a" && char <= "z") hasLower = true;
         else if (char >= "0" && char <= "9") hasNumber = true;
         else hasSpecial = true;
@@ -96,35 +109,35 @@ const Dashboard = () => {
       return hasUpper && hasLower && hasNumber && hasSpecial;
     };
 
+    
+    if (isDuplicateName) {
+      newErrors.name = "Name already exists";
+    }
+
     if (isDuplicateEmail) {
-      alert("Email already exists!");
-      return;
+      newErrors.email = "Email already exists";
     }
 
     if (isDuplicateNumber) {
-      alert("Number already exists!");
-      return;
-    }
-
-    if (isDuplicatePass) {
-      alert("Password already exists!");
-      return;
-    }
-
-    if (isDuplicateName) {
-      alert("Name already exists!");
-      return;
+      newErrors.number = "Number already exists";
     }
 
     if (form.number.length !== 10) {
-      alert("Number must be exactly 10 digits!");
-      return;
+      newErrors.number = "Number must be 10 digits";
+    }
+
+    if (isDuplicatePass) {
+      newErrors.password = "Password already exists";
     }
 
     if (!validatePassword(form.password)) {
-      alert(
-        "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character!",
-      );
+      newErrors.password =
+        "Min 8 chars with uppercase, lowercase, number & special char";
+    }
+
+    setErrors(newErrors);
+
+    if (Object.values(newErrors).some((err) => err !== "")) {
       return;
     }
 
@@ -133,6 +146,7 @@ const Dashboard = () => {
     } else {
       setUsers([...users, { ...form, id: Date.now() }]);
     }
+
     setForm({
       id: null,
       name: "",
@@ -140,6 +154,14 @@ const Dashboard = () => {
       password: "",
       number: "",
     });
+
+    setErrors({
+      name: "",
+      email: "",
+      password: "",
+      number: "",
+    });
+
     dialog.close();
   };
   const handleNumberChange = (e) => {
@@ -166,56 +188,53 @@ const Dashboard = () => {
           justifyContent: "center",
           alignItems: "center",
         }}
-      >
-       
-      </div>
+      ></div>
       <dialog id="demo-dialog-form" onSubmit={handleSubmit}>
         <form method="dialog">
           <header>
             <h3>Add</h3>
           </header>
           <div>
-           
-             
-              <input
-                type="text"
-                name="name"
-                placeholder="Name"
-                value={form.name}
-                onChange={handleChange}
-                required
-              />
-           
-            
-              <input
-                type="email"
-                name="email"
-                placeholder="Email"
-                value={form.email}
-                onChange={handleChange}
-                required
-              />
-              
-              <input
-                type="password"
-                name="password"
-                placeholder="Password"
-                value={form.password}
-                onChange={handleChange}
-                required
-              />
-            
-              
-              <input
-                type="tel"
-                name="number"
-                placeholder="Number"
-                value={form.number}
-                onChange={handleNumberChange}
-                maxLength="10"
-                required
-              />
-            
+            <input
+              type="text"
+              name="name"
+              placeholder="Name"
+              value={form.name}
+              onChange={handleChange}
+              required
+            />
+            {errors.name && <p className="error">{errors.name}</p>}
+
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              value={form.email}
+              onChange={handleChange}
+              required
+            />
+            {errors.email && <p className="error">{errors.email}</p>}
+
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              value={form.password}
+              onChange={handleChange}
+              required
+            />
+            {errors.password && <p className="error">{errors.password}</p>}
+
+            <input
+              type="tel"
+              name="number"
+              placeholder="Number"
+              value={form.number}
+              onChange={handleNumberChange}
+              maxLength="10"
+              required
+            />
+            {errors.number && <p className="error">{errors.number}</p>}
           </div>
           <footer>
             <button
@@ -233,9 +252,11 @@ const Dashboard = () => {
         </form>
       </dialog>
       <div className="flex mt-15 mb-12">
-
-      <h3 style={{fontWeight:"600"}} className="mr-310"> User List</h3>
-       <button
+        <h3 style={{ fontWeight: "600" }} className="mr-310">
+          {" "}
+          User List
+        </h3>
+        <button
           commandfor="demo-dialog-form"
           command="show-modal"
           style={{
@@ -249,13 +270,11 @@ const Dashboard = () => {
             cursor: "pointer",
             boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
             transition: "all 0.3s ease",
-            
           }}
         >
           Add Users <MdDashboard />
         </button>
       </div>
-      
       <table>
         <thead>
           <tr>
@@ -279,7 +298,7 @@ const Dashboard = () => {
                     cursor: "pointer",
                     fontSize: "18px",
                     color: "#333",
-                    marginLeft:"5px"
+                    marginLeft: "5px",
                   }}
                 >
                   {showPassword[user.id] ? <FaEyeSlash /> : <FaEye />}
@@ -293,7 +312,7 @@ const Dashboard = () => {
                   }}
                 >
                   <IoMdCopy />
-                  </button>
+                </button>
               </td>
               <td>{user.number}</td>
               <td>

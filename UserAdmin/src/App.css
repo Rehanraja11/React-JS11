@@ -87,3 +87,9 @@ table {
   background-color: #0d0f11;
   color: #fff;
 }
+
+.error {
+  color: red;
+  font-size: 13px;
+  margin-top: 4px;
+}

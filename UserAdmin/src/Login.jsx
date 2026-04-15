@@ -66,7 +66,6 @@ const Login = () => {
           onChange={(e) => setEmail(e.target.value)}
           required
           />
-
         <br />
           <label>Password</label>
         <input
@@ -84,3 +83,4 @@ const Login = () => {
 };
 
 export default Login;
+
