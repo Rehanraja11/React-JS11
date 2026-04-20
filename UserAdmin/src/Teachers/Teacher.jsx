@@ -13,6 +13,7 @@ const Teacher = () => {
 
   const [showPassword, setShowPassword] = useState({});
   const [deleteTeacher, setDeleteTeacher] = useState(null);
+  const [searchTeacher, setSearchTeacher] = useState("");
 
   const [form, setForm] = useState({
     id: null,
@@ -123,6 +124,11 @@ const Teacher = () => {
     document.getElementById("delete-teacher-dialog").close();
   };
 
+   const filteredTeacher = teachers.filter((t) =>
+    t.name.toLowerCase().includes(searchTeacher.toLowerCase())||
+    t.email.includes(searchTeacher),
+  );
+
   return (
     <DefaultLayout>
       <dialog id="teacher-dialog" style={{ padding: "20px" }}>
@@ -190,17 +196,39 @@ const Teacher = () => {
         </form>
       </dialog>
 
-      <div className="flex mt-15 mb-12">
-        <h3 style={{ fontWeight: "600" }} className="mr-310">
-          {" "}
+      
+
+      <div className="flex mt-15 mb-12 items-center justify-between mr-40">
+        
+        <h3 >
+         
           Teacher List
         </h3>
+        
+        <div>
+        <input
+          type="text"
+          placeholder="🔍 Search Teacher"
+          value={searchTeacher}
+          onChange={(e) => setSearchTeacher(e.target.value)}
+          style={{
+            padding: "8px",
+            width: "250px",
+            borderRadius: "9px",
+            border: "1px solid #120325",
+            fontSize: "1.1rem",
+            lineHeight: "1.9rem",
+            outline: "none",
+            marginRight:"19px"
+          }}
+        />
+      
         <button
           onClick={() => document.getElementById("teacher-dialog").showModal()}
           style={{
             background: "linear-gradient(135deg, #000000, #333333)",
             color: "#ffffff",
-            padding: "12px 22px",
+            padding: "13px",
             borderRadius: "8px",
             border: "none",
             fontSize: "16px",
@@ -213,22 +241,22 @@ const Teacher = () => {
           Add Teachers
           <GiTeacher />
         </button>
+        </div>
       </div>
 
       <table>
         <thead>
           <tr>
-            <th style={myStyle}>Teacher.Name</th>
-            <th style={myStyle}>Teacher.Email</th>
+            <th style={myStyle}>Teacher Name</th>
+            <th style={myStyle}>Teacher Email</th>
             <th style={myStyle}>Password</th>
             <th style={myStyle}>Qualifications</th>
-            <th style={myStyle}>Number</th>
+            <th style={myStyle}>Phone Number</th>
             <th style={myStyle}>Action</th>
           </tr>
         </thead>
-
         <tbody>
-          {teachers.map((t) => (
+          {filteredTeacher.map((t) => (
             <tr key={t.id}>
               <td>{t.name}</td>
               <td>{t.email}</td>

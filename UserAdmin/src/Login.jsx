@@ -1,86 +1,123 @@
-import React, { useContext } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "./Context/AuthContext.jsx";
-import { useState } from "react";
-import { useEffect } from "react";
 
 const Login = () => {
   const { email, setEmail, password, setPassword } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [errors, setErrors] = useState(" ");
+  const [errors, setErrors] = useState({});
 
   const handleLogin = (e) => {
     e.preventDefault();
+
     const users = JSON.parse(localStorage.getItem("users")) || [];
     const students = JSON.parse(localStorage.getItem("students")) || [];
     const teachers = JSON.parse(localStorage.getItem("teachers")) || [];
 
     const validUser = users.find(
-      (u) => u.email === email && u.password === password,
+      (u) => u.email === email && u.password === password
     );
     const validStudent = students.find(
-      (u) => u.email === email && u.password === password,
+      (u) => u.email === email && u.password === password
     );
-    const validTeachers = teachers.find(
-      (u) => u.email === email && u.password === password,
+    const validTeacher = teachers.find(
+      (u) => u.email === email && u.password === password
     );
 
     const admin = email === "rehann@gmail.com" && password === "1111";
 
-    if (validUser || admin || validStudent || validTeachers) {
-      localStorage.setItem("loggedInUser", JSON.stringify(validUser));
+    if (validUser || validStudent || validTeacher || admin) {
+      localStorage.setItem(
+        "loggedInUser",
+        JSON.stringify(validUser || validStudent || validTeacher)
+      );
       localStorage.setItem("isAuth", "true");
       navigate("/dashboard");
     } else {
-      setErrors(
-        { ...errors, email: "Invalid  credentials" }
-      );
+      setErrors({ email: "Invalid credentials" });
     }
   };
+
   useEffect(() => {
     const isAuth = localStorage.getItem("isAuth");
-
-    if (isAuth) {
-      navigate("/dashboard");
-    }
+    if (isAuth) navigate("/dashboard");
   }, []);
+
   return (
-    <>
-      <form
-        onSubmit={handleLogin}
-        style={{
-          padding: "20px",
-          margin: "200px",
-          width: "550px",
-          borderRadius: "11px",
-          marginLeft: "630px",
-          marginTop: "300px",
-        }}
-      >
-        <h2 style={{ textAlign: "center" }}>Login</h2>
-        {errors.email && <span style={{ color: "red", }}>{errors.email}</span>}
-        <label>Email</label>
+    <div style={styles.container}>
+      <form onSubmit={handleLogin} style={styles.box}>
+        <h2 style={styles.title}>Login</h2>
+
+        {errors.email && <p style={styles.error}>{errors.email}</p>}
+        <label> Email</label>
         <input
           type="email"
           placeholder="Email"
           onChange={(e) => setEmail(e.target.value)}
           required
-          />
-        <br />
-          <label>Password</label>
+          style={styles.input}
+        />
+         <label> Password</label>
         <input
           type="password"
           placeholder="Password"
           onChange={(e) => setPassword(e.target.value)}
           required
+          style={styles.input}
         />
-        <br />
-        <br />
-        <button type="submit">Login</button>
+
+        <button type="submit" style={styles.button}>
+          Login
+        </button>
       </form>
-    </>
+    </div>
   );
 };
 
-export default Login;
+const styles = {
+  container: {
+    height: "100vh",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    background: "#f5f5f5",
+  },
+  box: {
+    background: "#ffffff",
+    padding: "30px",
+    borderRadius: "8px",
+    width: "500px",
+    border: "1px solid #ddd",
+  },
+  title: {
+    textAlign: "center",
+    marginBottom: "15px",
+    fontWeight: "550",
+  },
+  input: {
+    width: "100%",
+    padding: "12px",
+    marginBottom: "20px",
+    border: "1px solid #ccc",
+    borderRadius: "5px",
+    outline: "none",
+  },
+  button: {
+    width: "100%",
+    padding: "10px",
+    background: "#333",
+    color: "#fff",
+    border: "none",
+    borderRadius: "5px",
+    cursor: "pointer",
+    
+  },
+  error: {
+    color: "red",
+    fontSize: "13px",
+    marginBottom: "10px",
+    textAlign: "center",
+  },
+};
 
+export default Login;

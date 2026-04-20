@@ -18,6 +18,7 @@ function App() {
           <Route path="/student" element={<ProtectedRoute><Student/></ProtectedRoute>} />
           <Route path="/teacher" element={<ProtectedRoute><Teacher/></ProtectedRoute>} />
           <Route path="/subject" element={<ProtectedRoute><Subject/></ProtectedRoute>} />
+          <Route path="/class" element={<ProtectedRoute><Class/></ProtectedRoute>} />
         </Routes>  
         );
 }

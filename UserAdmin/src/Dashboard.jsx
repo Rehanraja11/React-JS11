@@ -13,6 +13,7 @@ const Dashboard = () => {
   );
   const [showPassword, setShowPassword] = useState({});
   const [deleteUser, setDeleteUser] = useState(null);
+  const [searchUser, setSearchUser] = useState("");
 
   const [form, setForm] = useState({
     id: null,
@@ -109,7 +110,6 @@ const Dashboard = () => {
       return hasUpper && hasLower && hasNumber && hasSpecial;
     };
 
-    
     if (isDuplicateName) {
       newErrors.name = "Name already exists";
     }
@@ -180,6 +180,12 @@ const Dashboard = () => {
     const dialog = document.getElementById("demo-dialog-form");
     dialog.showModal();
   };
+
+  const filteredUser = users.filter(
+    (t) =>
+      t.name.toLowerCase().includes(searchUser.toLowerCase()) ||
+      t.email.includes(searchUser),
+  );
   return (
     <DefaultLayout>
       <div
@@ -251,11 +257,28 @@ const Dashboard = () => {
           </footer>
         </form>
       </dialog>
-      <div className="flex mt-15 mb-12">
-        <h3 style={{ fontWeight: "600" }} className="mr-310">
-          {" "}
+
+      <div className="flex mt-15 mb-12 items-center justify-between mr-40">
+        <h3>
           User List
         </h3>
+        <div>
+           <input
+          type="text"
+          placeholder="🔍 Search User"
+          value={searchUser}
+          onChange={(e) => setSearchUser(e.target.value)}
+          style={{
+            padding: "8px",
+            width: "250px",
+            borderRadius: "9px",
+            border: "1px solid #120325",
+            fontSize: "1.1rem",
+            lineHeight: "1.9rem",
+            outline: "none",
+            marginRight:"19px"
+          }}
+        />
         <button
           commandfor="demo-dialog-form"
           command="show-modal"
@@ -274,6 +297,7 @@ const Dashboard = () => {
         >
           Add Users <MdDashboard />
         </button>
+        </div>
       </div>
       <table>
         <thead>
@@ -286,7 +310,7 @@ const Dashboard = () => {
           </tr>
         </thead>
         <tbody style={{}}>
-          {users.map((user) => (
+          {filteredUser.map((user) => (
             <tr key={user.id}>
               <td>{user.name}</td>
               <td>{user.email}</td>

@@ -1,6 +1,7 @@
 import { useContext,useState } from "react";
 import { useNavigate } from "react-router-dom";
 // import { AuthContextdata } from "./Context/AuthContextdata";
+import "./App.css";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -27,7 +28,7 @@ function Login() {
   };
   return (
     <div style={styles.container}>
-      -
+      
       <div style={styles.left}>
         <h1 style={styles.brand}>STAY STRONG</h1>
         <p style={styles.tagline}>

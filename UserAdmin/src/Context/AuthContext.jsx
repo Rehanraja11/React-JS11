@@ -1,7 +1,8 @@
 import { createContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-export  const AuthContext = createContext();
+// eslint-disable-next-line react-refresh/only-export-components
+export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [email, setEmail] = useState("");
@@ -20,5 +21,4 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
-
 

@@ -9,6 +9,7 @@ const Subject = () => {
     JSON.parse(localStorage.getItem("subjects")) || [],
   );
   const [deleteSubject, setDeleteSubject] = useState(null);
+  const [searchSubject, setSearchSubject] = useState("");
 
   const [form, setForm] = useState({
     id: null,
@@ -74,6 +75,13 @@ const Subject = () => {
     document.getElementById("delete-subject-dialog").close();
   };
 
+  const filteredStudents = subjects.filter(
+    (s) =>
+      s.subjectName.toLowerCase().includes(searchSubject.toLowerCase()) ||
+      s.semester.toLowerCase().includes(searchSubject.toLowerCase()) 
+      
+  );
+
 
   return (
     <DefaultLayout>
@@ -117,11 +125,27 @@ const Subject = () => {
           </button>
         </form>
       </dialog>
-      <div className="flex mt-15 mb-12">
-        <h3 style={{ fontWeight: "600" }} className="mr-310">
-          {" "}
+      <div className="flex mt-15 mb-12 items-center justify-between mr-40">
+        <h3 >
           Subject List
         </h3>
+        <div>
+          <input
+          type="text"
+          placeholder="🔍 Search Subject"
+          value={searchSubject}
+          onChange={(e) => setSearchSubject(e.target.value)}
+          style={{
+            padding: "8px",
+            width: "250px",
+            borderRadius: "9px",
+            border: "1px solid #120325",
+            fontSize: "1.1rem",
+            lineHeight: "1.9rem",
+            outline: "none",
+            marginRight:"19px"
+          }}
+        />
         <button
           onClick={() => document.getElementById("subject-dialog").showModal()}
           style={{
@@ -139,6 +163,7 @@ const Subject = () => {
         >
            Add Subject <IoBookSharp />  
         </button>
+        </div>
       </div>
       <table>
         <thead>
@@ -150,7 +175,7 @@ const Subject = () => {
           </tr>
         </thead>
         <tbody>
-          {subjects.map((s) => (
+          {filteredStudents.map((s) => (
             <tr key={s.id}>
               <td>{s.subjectName}</td>
               <td>{s.semester}</td>
@@ -203,3 +228,4 @@ const Subject = () => {
 };
 const myStyle = { color: "Gray", fontWeight: "550" };
 export default Subject;
+
