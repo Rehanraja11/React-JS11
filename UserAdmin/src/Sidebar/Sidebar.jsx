@@ -7,7 +7,9 @@ import { IoBookSharp } from "react-icons/io5";
 import { SiGoogleclassroom } from "react-icons/si";
 import Dashboard from "../Dashboard";
 
-const Sidebar = () => {
+
+
+const Sidebar = () => { 
   return (
     <div className="sidebar">
       <ul>  

@@ -29,35 +29,28 @@ const Student = () => {
     address: "",
     city: "",
   });
-
   const [errors, setErrors] = useState({});
   const [viewStudent, setViewStudent] = useState(null);
-
   useEffect(() => {
     localStorage.setItem("students", JSON.stringify(students));
   }, [students]);
-
   const handleView = (student) => {
     setViewStudent(student);
     document.getElementById("view-student-dialog").showModal();
   };
-
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
-
   const handleNumberChange = (e) => {
     const value = e.target.value.replace(/\D/g, "").slice(0, 10);
     setForm({ ...form, number: value });
   };
-
   const validatePassword = (password) => {
     if (password.length < 8) return false;
     let hasUpper = false,
       hasLower = false,
       hasNumber = false,
       hasSpecial = false;
-
     for (let char of password) {
       if (char >= "A" && char <= "Z") hasUpper = true;
       else if (char >= "a" && char <= "z") hasLower = true;
@@ -69,7 +62,6 @@ const Student = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const dialog = document.getElementById("student-dialog");
-
     const isDuplicate = students.some(
       (s) =>
         (s.email === form.email ||
@@ -82,7 +74,6 @@ const Student = () => {
       alert("Duplicate data found!");
       return;
     }
-
     if (!validatePassword(form.password)) {
       setErrors({ password: "Weak Password" });
       return;
@@ -103,27 +94,21 @@ const Student = () => {
       address: "",
       city: "",
     });
-
     dialog.close();
   };
-    
-
   const handleEdit = (student) => {
     setForm(student);
     document.getElementById("student-dialog").showModal();
   };
-
   const handleDelete = (student) => {
     setDeleteStudent(student);
     document.getElementById("delete-student-dialog").showModal();
   };
-
   const confirmDelete = () => {
     setStudents(students.filter((s) => s.id !== deleteStudent.id));
     setDeleteStudent(null);
     document.getElementById("delete-student-dialog").close();
   };
-
   const filteredStudents = students.filter((s) => {
     const matchesSearch =
       s.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -142,7 +127,6 @@ const Student = () => {
           onSubmit={handleSubmit}
         >
           <h3>{form.id ? "Edit Student" : "Add Student"}</h3>
-
           <input
             name="name"
             placeholder="Name"
@@ -166,7 +150,6 @@ const Student = () => {
             onChange={handleChange}
             required
           />
-
           {errors.password && (
             <span style={{ color: "red" }}>{errors.password}</span>
           )}
@@ -261,7 +244,6 @@ const Student = () => {
             <option value="11th">Class 11</option>
             <option value="12th">Class 12</option>
           </select>
-
           <input
             type="text"
             placeholder="🔍 Search Student"
@@ -278,7 +260,6 @@ const Student = () => {
               marginRight: "19px",
             }}
           />
-
           <button
             onClick={() =>
               document.getElementById("student-dialog").showModal()
@@ -299,7 +280,6 @@ const Student = () => {
           </button>
         </div>
       </div>
-
       <table>
         <thead>
           <tr>
