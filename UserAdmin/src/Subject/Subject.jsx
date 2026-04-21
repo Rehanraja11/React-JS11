@@ -55,10 +55,8 @@ const Subject = () => {
       semester: "",
       instructor: "",
     });
-
     dialog.close();
   };
-
   const handleEdit = (subject) => {
     setForm(subject);
     document.getElementById("subject-dialog").showModal();
@@ -78,10 +76,8 @@ const Subject = () => {
   const filteredStudents = subjects.filter(
     (s) =>
       s.subjectName.toLowerCase().includes(searchSubject.toLowerCase()) ||
-      s.semester.toLowerCase().includes(searchSubject.toLowerCase()) 
-      
+      s.semester.toLowerCase().includes(searchSubject.toLowerCase()),
   );
-
 
   return (
     <DefaultLayout>
@@ -126,43 +122,43 @@ const Subject = () => {
         </form>
       </dialog>
       <div className="flex mt-15 mb-12 items-center justify-between mr-40">
-        <h3 >
-          Subject List
-        </h3>
+        <h3>Subject List</h3>
         <div>
           <input
-          type="text"
-          placeholder="🔍 Search Subject"
-          value={searchSubject}
-          onChange={(e) => setSearchSubject(e.target.value)}
-          style={{
-            padding: "8px",
-            width: "250px",
-            borderRadius: "9px",
-            border: "1px solid #120325",
-            fontSize: "1.1rem",
-            lineHeight: "1.9rem",
-            outline: "none",
-            marginRight:"19px"
-          }}
-        />
-        <button
-          onClick={() => document.getElementById("subject-dialog").showModal()}
-          style={{
-            background: "linear-gradient(135deg, #000000, #333333)",
-            color: "#ffffff",
-            padding: "12px 22px",
-            borderRadius: "8px",
-            border: "none",
-            fontSize: "16px",
-            fontWeight: "600",
-            cursor: "pointer",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
-            transition: "all 0.3s ease",
-          }}
-        >
-           Add Subject <IoBookSharp />  
-        </button>
+            type="text"
+            placeholder="🔍 Search Subject"
+            value={searchSubject}
+            onChange={(e) => setSearchSubject(e.target.value)}
+            style={{
+              padding: "8px",
+              width: "250px",
+              borderRadius: "9px",
+              border: "1px solid #120325",
+              fontSize: "1.1rem",
+              lineHeight: "1.9rem",
+              outline: "none",
+              marginRight: "19px",
+            }}
+          />
+          <button
+            onClick={() =>
+              document.getElementById("subject-dialog").showModal()
+            }
+            style={{
+              background: "linear-gradient(135deg, #000000, #333333)",
+              color: "#ffffff",
+              padding: "12px 22px",
+              borderRadius: "8px",
+              border: "none",
+              fontSize: "16px",
+              fontWeight: "600",
+              cursor: "pointer",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+              transition: "all 0.3s ease",
+            }}
+          >
+            Add Subject <IoBookSharp />
+          </button>
         </div>
       </div>
       <table>
@@ -207,13 +203,11 @@ const Subject = () => {
           ))}
         </tbody>
       </table>
-
       <dialog id="delete-subject-dialog" style={{ padding: "20px" }}>
         <h3>Delete Subject</h3>
         <p>
           Are you sure you want to delete <b>{deleteSubject?.subjectName}</b>?
         </p>
-
         <button onClick={confirmDelete}>Delete</button>
         <button
           onClick={() =>
@@ -228,4 +222,3 @@ const Subject = () => {
 };
 const myStyle = { color: "Gray", fontWeight: "550" };
 export default Subject;
-

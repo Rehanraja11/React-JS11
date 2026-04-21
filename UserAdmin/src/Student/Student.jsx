@@ -106,6 +106,7 @@ const Student = () => {
 
     dialog.close();
   };
+    
 
   const handleEdit = (student) => {
     setForm(student);
