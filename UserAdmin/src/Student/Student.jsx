@@ -290,7 +290,6 @@ const Student = () => {
             <th style={myStyle}>Action</th>
           </tr>
         </thead>
-
         <tbody>
           {filteredStudents.length > 0 ? (
             filteredStudents.map((s) => (
@@ -298,7 +297,7 @@ const Student = () => {
                 <td>{s.name}</td>
                 <td>{s.email}</td>
                 <td>{s.number}</td>
-
+                
                 <td>
                   <button
                     onClick={() => handleView(s)}
@@ -408,7 +407,6 @@ const Student = () => {
             <p>
               Are you sure you want to delete <b>{deleteStudent.name}</b>?
             </p>
-
             <button
               onClick={confirmDelete}
               style={{
@@ -419,7 +417,6 @@ const Student = () => {
             >
               Yes, Delete
             </button>
-
             <button
               onClick={() =>
                 document.getElementById("delete-student-dialog").close()

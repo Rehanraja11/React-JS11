@@ -1,13 +1,43 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, {  useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "./Context/AuthContext.jsx";
 
 const Login = () => {
-  const { email, setEmail, password, setPassword } = useContext(AuthContext);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const [errors, setErrors] = useState({});
 
-  const handleLogin = (e) => {
+  // const handleLogin = async (e) => {
+  //   e.preventDefault();
+
+  //   try {
+  //     const response = await fetch("http://192.168.0.113:8000/api/v1/users/login", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({
+  //         email,
+  //         password,
+  //       }),
+  //     });
+
+  //     const data = await response.json();
+
+  //     if (response.ok) {
+  //       localStorage.setItem("loggedInUser", JSON.stringify(data.user));
+  //       localStorage.setItem("isAuth", "true");
+  //       navigate("/dashboard");
+  //     } else {
+  //       setErrors({ email: data.message || "Invalid credentials" });
+  //     }
+  //   } catch (error) {
+  //     console.error("Login error:", error);
+  //     setErrors({ email: "Server error. Try again later." });
+  //   }
+  // };
+   const handleLogin = (e) => {
     e.preventDefault();
 
     const users = JSON.parse(localStorage.getItem("users")) || [];
@@ -37,7 +67,6 @@ const Login = () => {
       setErrors({ email: "Invalid credentials" });
     }
   };
-
   useEffect(() => {
     const isAuth = localStorage.getItem("isAuth");
     if (isAuth) navigate("/dashboard");
@@ -57,7 +86,7 @@ const Login = () => {
           required
           style={styles.input}
         />
-         <label> Password</label>
+        <label> Password</label>
         <input
           type="password"
           placeholder="Password"
@@ -110,7 +139,6 @@ const styles = {
     border: "none",
     borderRadius: "5px",
     cursor: "pointer",
-    
   },
   error: {
     color: "red",
@@ -121,3 +149,6 @@ const styles = {
 };
 
 export default Login;
+
+
+

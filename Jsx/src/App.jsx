@@ -1,28 +1,27 @@
-import React from 'react'
+// import React from 'react'
 
-const App = () => {
-  const Website = "WEB DEVLOPMENT"
-  const Price = 11111
-  const isAvilable = true
-  return (
-    <div>
-      <h1>Appsile Coder's BootCamp</h1>
-      <h2>Website  : {Website}</h2>
-      <h2>Website Price : {Price}</h2>
+// const App = () => {
+//   const Website = "WEB DEVLOPMENT"
+//   const Price = 11111
+//   const isAvilable = true
+//   return (
+//     <div>
+//       <h1>Appsile Coder's BootCamp</h1>
+//       <h2>Website  : {Website}</h2>
+//       <h2>Website Price : {Price}</h2>
 
-    <p>
-      Status : {isAvilable?"Yes":"No"}
-    </p>
-    </div>
-  )
-}
+//     <p>
+//       Status : {isAvilable?"Yes":"No"}
+//     </p>
+//     </div>
+//   )
+// }
 
-export default App
-
-
+// export default App
 
 
-// import React, { useState, useEffect } from "react";
+
+// import { useState , useEffect } from "react";
 // import DefaultLayout from "../layout/DefaultLayout";
 
 // const Fees = () => {
