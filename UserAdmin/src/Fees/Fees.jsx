@@ -22,7 +22,7 @@ const Fees = () => {
     id: null,
     studentId: "",
     studentName: "",
-    class: "",
+    classes: "",
     totalFee: "",
     paid: " ",
     pending: "",
@@ -51,13 +51,13 @@ const Fees = () => {
     const selectedStudent = students.find((s) => s.id == studentId);
     if (!selectedStudent) return;
 
-    const fee = getClassFee(selectedStudent.class);
+    const fee = getClassFee(selectedStudent.classes);
 
     setForm({
       ...form,
       studentId: selectedStudent.id,
       studentName: selectedStudent.name,
-      class: selectedStudent.class,
+      classes: selectedStudent.classes,
       totalFee: fee,
       paid: " ",
       pending: fee,
@@ -78,29 +78,37 @@ const Fees = () => {
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    const newFee = {
-      ...form,
-      id: Date.now(),
-      date: new Date().toLocaleDateString(),
-    };
 
-    setFees([...fees, newFee]);
+  const exists = fees.find((f) => f.studentId === form.studentId);
 
-    setForm({
-      id: null,
-      studentId: "",
-      studentName: "",
-      class: "",
-      totalFee: "",
-      paid: " ",
-      pending: "",
-      status: "unpaid",
-    });
+  if (exists) {
+    alert("Fees already added for this student. Use Pay option.");
+    return;
+  }
 
-    document.getElementById("fees-dialog").close();
+  const newFee = {
+    ...form,
+    id: Date.now(),
+    date: new Date().toLocaleDateString(),
   };
+
+  setFees([...fees, newFee]);
+
+  setForm({
+    id: null,
+    studentId: "",
+    studentName: "",
+    classes: "",
+    totalFee: "",
+    paid: " ",
+    pending: "",
+    status: "unpaid",
+  });
+
+  document.getElementById("fees-dialog").close();
+};
 
   const handlePay = (fee) => {
     setSelectedFee(fee);
@@ -213,7 +221,7 @@ const Fees = () => {
             filteredFees.map((f) => (
               <tr key={f.id}>
                 <td>{f.studentName}</td>
-                <td>{f.class}</td>
+                <td>{f.classes}</td>
                 <td>₹{f.totalFee}</td>
                 <td>₹{f.paid}</td>
                 <td>₹{f.pending}</td>
@@ -232,7 +240,7 @@ const Fees = () => {
                 <td>
                   {f.status === "unpaid" ? (
                     <button
-                      style={{ background: "#023020", fontWeight: "600", }}
+                      style={{ background: "#023020", fontWeight: "600",textAlign:"center"  }}
                       onClick={() => handlePay(f)}
                     >
                       {" "}
@@ -240,11 +248,11 @@ const Fees = () => {
                     </button>
                   ):(
                     <button
-                      style={{ background: "#023020", fontWeight: "600", }}
+                      style={{ color:"green", background: "transparent",border:"none", fontWeight: "600",fontSize:"1.1rem"}}
                       
                     >
                       {" "}
-                      <MdDone />     Done
+                       Done
                     </button>
                   )}
                 </td>

@@ -7,6 +7,7 @@ import DefaultLayout from "../layout/DefaultLayout";
 import { PiStudentFill } from "react-icons/pi";
 import { FaUsersViewfinder } from "react-icons/fa6";
 import { IoSearch } from "react-icons/io5";
+import axios from "axios";
 
 const Student = () => {
   const [students, setStudents] = useState(
@@ -18,13 +19,13 @@ const Student = () => {
 
   const [deleteStudent, setDeleteStudent] = useState(null);
 
-  const [form, setForm] = useState({
+  const [form, setStudentForm] = useState({
     id: null,
     name: "",
     email: "",
     password: "",
-    number: "",
-    class: "",
+    phone: "",
+    classes: "",
     dob: "",
     address: "",
     city: "",
@@ -39,33 +40,51 @@ const Student = () => {
     document.getElementById("view-student-dialog").showModal();
   };
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setStudentForm({ ...form, [e.target.name]: e.target.value });
   };
-  const handleNumberChange = (e) => {
+  const handlephoneChange = (e) => {
     const value = e.target.value.replace(/\D/g, "").slice(0, 10);
-    setForm({ ...form, number: value });
+    setStudentForm({ ...form, phone: value });
   };
   const validatePassword = (password) => {
     if (password.length < 8) return false;
     let hasUpper = false,
       hasLower = false,
-      hasNumber = false,
+      hasphone = false,
       hasSpecial = false;
     for (let char of password) {
       if (char >= "A" && char <= "Z") hasUpper = true;
       else if (char >= "a" && char <= "z") hasLower = true;
-      else if (char >= "0" && char <= "9") hasNumber = true;
+      else if (char >= "0" && char <= "9") hasphone = true;
       else hasSpecial = true;
     }
-    return hasUpper && hasLower && hasNumber && hasSpecial;
+    return hasUpper && hasLower && hasphone && hasSpecial;
   };
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    const token = localStorage.getItem("token");
+
+    try {
+      const res = await axios.post(
+        "http://192.168.0.113:8000/api/v1/users/create-student",
+        form,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      console.log(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+
     const dialog = document.getElementById("student-dialog");
     const isDuplicate = students.some(
       (s) =>
         (s.email === form.email ||
-          s.number === form.number ||
+          s.phone === form.phone ||
           s.name === form.name ||
           s.password === form.password) &&
         s.id !== form.id,
@@ -83,13 +102,13 @@ const Student = () => {
     } else {
       setStudents([...students, { ...form, id: Date.now() }]);
     }
-    setForm({
+    setStudentForm({
       id: null,
       name: "",
       email: "",
       password: "",
-      number: "",
-      class: "",
+      phone: "",
+      classes: "",
       dob: "",
       address: "",
       city: "",
@@ -97,7 +116,7 @@ const Student = () => {
     dialog.close();
   };
   const handleEdit = (student) => {
-    setForm(student);
+    setStudentForm(student);
     document.getElementById("student-dialog").showModal();
   };
   const handleDelete = (student) => {
@@ -153,18 +172,17 @@ const Student = () => {
           {errors.password && (
             <span style={{ color: "red" }}>{errors.password}</span>
           )}
-
           <input
             type="tel"
-            name="number"
-            placeholder="Number."
-            value={form.number}
-            onChange={handleNumberChange}
+            name="phone"
+            placeholder="phone."
+            value={form.phone}
+            onChange={handlephoneChange}
             maxLength="10"
           />
           <select
-            name="class"
-            value={form.class}
+            name="classes"
+            value={form.classes}
             onChange={handleChange}
             required
           >
@@ -202,7 +220,6 @@ const Student = () => {
             onChange={handleChange}
             required
           />
-
           <button type="submit">{form.id ? "Update" : "Add"}</button>
           <button
             type="button"
@@ -212,10 +229,8 @@ const Student = () => {
           </button>
         </form>
       </dialog>
-
       <div className="flex mt-15 mb-12 items-center justify-between mr-40">
         <h3>Student List</h3>
-
         <div className="flex items-center">
           <select
             className="w-40 h-12"
@@ -285,7 +300,7 @@ const Student = () => {
           <tr>
             <th style={myStyle}>Student Name</th>
             <th style={myStyle}>Student Email</th>
-            <th style={myStyle}>Phone Number</th>
+            <th style={myStyle}>Phone phone</th>
             <th style={myStyle}>Details</th>
             <th style={myStyle}>Action</th>
           </tr>
@@ -296,8 +311,8 @@ const Student = () => {
               <tr key={s.id}>
                 <td>{s.name}</td>
                 <td>{s.email}</td>
-                <td>{s.number}</td>
-                
+                <td>{s.phone}</td>
+
                 <td>
                   <button
                     onClick={() => handleView(s)}
@@ -374,10 +389,10 @@ const Student = () => {
               {viewStudent.password}
             </p>
             <p>
-              <b style={{ color: "#120325" }}>Phone:</b> {viewStudent.number}
+              <b style={{ color: "#120325" }}>Phone:</b> {viewStudent.phone}
             </p>
             <p>
-              <b style={{ color: "#120325" }}>Class:</b> {viewStudent.class}
+              <b style={{ color: "#120325" }}>classes:</b> {viewStudent.classes}
             </p>
             <p>
               <b style={{ color: "#120325" }}>DOB:</b> {viewStudent.dob}

@@ -6,6 +6,7 @@ import { FaRegEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import DefaultLayout from "./layout/DefaultLayout";
 import { MdDashboard } from "react-icons/md";
+import axios from "axios";
 
 const Dashboard = () => {
   const [users, setUsers] = useState(
@@ -20,14 +21,14 @@ const Dashboard = () => {
     name: "",
     email: "",
     password: "",
-    number: "",
+    phone: "",
   });
 
   const [errors, setErrors] = useState({
     name: "",
     email: "",
     password: "",
-    number: "",
+    phone: "",
   });
 
   const handleCopyPassword = (password) => {
@@ -64,8 +65,18 @@ const Dashboard = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+   
+    try {
+      const res = await axios.post(
+        "http://192.168.0.113:8000/api/v1/users/register",
+        form,
+      );
+      console.log(res.data);
+    } catch (err) {
+      console.error(err);
+    }
 
     const dialog = document.getElementById("demo-dialog-form");
 
@@ -73,11 +84,11 @@ const Dashboard = () => {
       name: "",
       email: "",
       password: "",
-      number: "",
+      phone: "",
     };
 
-    const isDuplicateNumber = users.some(
-      (u) => u.number === form.number && u.id !== form.id,
+    const isDuplicatephone = users.some(
+      (u) => u.phone === form.phone && u.id !== form.id,
     );
 
     const isDuplicateEmail = users.some(
@@ -97,17 +108,17 @@ const Dashboard = () => {
 
       let hasUpper = false;
       let hasLower = false;
-      let hasNumber = false;
+      let hasphone = false;
       let hasSpecial = false;
 
       for (let char of password) {
         if (char >= "A" && char <= "Z") hasUpper = true;
         else if (char >= "a" && char <= "z") hasLower = true;
-        else if (char >= "0" && char <= "9") hasNumber = true;
+        else if (char >= "0" && char <= "9") hasphone = true;
         else hasSpecial = true;
       }
 
-      return hasUpper && hasLower && hasNumber && hasSpecial;
+      return hasUpper && hasLower && hasphone && hasSpecial;
     };
 
     if (isDuplicateName) {
@@ -118,12 +129,12 @@ const Dashboard = () => {
       newErrors.email = "Email already exists";
     }
 
-    if (isDuplicateNumber) {
-      newErrors.number = "Number already exists";
+    if (isDuplicatephone) {
+      newErrors.phone = "phone already exists";
     }
 
-    if (form.number.length !== 10) {
-      newErrors.number = "Number must be 10 digits";
+    if (form.phone.length !== 10) {
+      newErrors.phone = "phone must be 10 digits";
     }
 
     if (isDuplicatePass) {
@@ -132,7 +143,7 @@ const Dashboard = () => {
 
     if (!validatePassword(form.password)) {
       newErrors.password =
-        "Min 8 chars with uppercase, lowercase, number & special char";
+        "Min 8 chars with uppercase, lowercase, phone & special char";
     }
 
     setErrors(newErrors);
@@ -152,21 +163,21 @@ const Dashboard = () => {
       name: "",
       email: "",
       password: "",
-      number: "",
+      phone: "",
     });
 
     setErrors({
       name: "",
       email: "",
       password: "",
-      number: "",
+      phone: "",
     });
 
     dialog.close();
   };
-  const handleNumberChange = (e) => {
+  const handlephoneChange = (e) => {
     const value = e.target.value.replace(/\D/g, "").slice(0, 10);
-    setForm({ ...form, number: value });
+    setForm({ ...form, phone: value });
   };
 
   const handleDelete = (user) => {
@@ -233,14 +244,14 @@ const Dashboard = () => {
 
             <input
               type="tel"
-              name="number"
-              placeholder="Number"
-              value={form.number}
-              onChange={handleNumberChange}
+              name="phone"
+              placeholder="phone"
+              value={form.phone}
+              onChange={handlephoneChange}
               maxLength="10"
               required
             />
-            {errors.number && <p className="error">{errors.number}</p>}
+            {errors.phone && <p className="error">{errors.phone}</p>}
           </div>
           <footer>
             <button
@@ -259,44 +270,42 @@ const Dashboard = () => {
       </dialog>
 
       <div className="flex mt-15 mb-12 items-center justify-between mr-40">
-        <h3>
-          User List
-        </h3>
+        <h3>User List</h3>
         <div>
-           <input
-          type="text"
-          placeholder="🔍 Search User"
-          value={searchUser}
-          onChange={(e) => setSearchUser(e.target.value)}
-          style={{
-            padding: "8px",
-            width: "250px",
-            borderRadius: "9px",
-            border: "1px solid #120325",
-            fontSize: "1.1rem",
-            lineHeight: "1.9rem",
-            outline: "none",
-            marginRight:"19px"
-          }}
-        />
-        <button
-          commandfor="demo-dialog-form"
-          command="show-modal"
-          style={{
-            background: "linear-gradient(135deg, #000000, #333333)",
-            color: "#ffffff",
-            padding: "12px 22px",
-            borderRadius: "8px",
-            border: "none",
-            fontSize: "16px",
-            fontWeight: "600",
-            cursor: "pointer",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
-            transition: "all 0.3s ease",
-          }}
-        >
-          Add Users <MdDashboard />
-        </button>
+          <input
+            type="text"
+            placeholder="🔍 Search User"
+            value={searchUser}
+            onChange={(e) => setSearchUser(e.target.value)}
+            style={{
+              padding: "8px",
+              width: "250px",
+              borderRadius: "9px",
+              border: "1px solid #120325",
+              fontSize: "1.1rem",
+              lineHeight: "1.9rem",
+              outline: "none",
+              marginRight: "19px",
+            }}
+          />
+          <button
+            commandfor="demo-dialog-form"
+            command="show-modal"
+            style={{
+              background: "linear-gradient(135deg, #000000, #333333)",
+              color: "#ffffff",
+              padding: "12px 22px",
+              borderRadius: "8px",
+              border: "none",
+              fontSize: "16px",
+              fontWeight: "600",
+              cursor: "pointer",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+              transition: "all 0.3s ease",
+            }}
+          >
+            Add Users <MdDashboard />
+          </button>
         </div>
       </div>
       <table>
@@ -305,7 +314,7 @@ const Dashboard = () => {
             <th style={myStyle}>Name</th>
             <th style={myStyle}>Email</th>
             <th style={myStyle}>Password</th>
-            <th style={myStyle}>Number</th>
+            <th style={myStyle}>phone</th>
             <th style={myStyle}>Action</th>
           </tr>
         </thead>
@@ -338,7 +347,7 @@ const Dashboard = () => {
                   <IoMdCopy />
                 </button>
               </td>
-              <td>{user.number}</td>
+              <td>{user.phone}</td>
               <td>
                 <button
                   onClick={() => handleEdit(user)}

@@ -1,4 +1,4 @@
-import React, {  useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "./Context/AuthContext.jsx";
 
@@ -8,69 +8,73 @@ const Login = () => {
   const navigate = useNavigate();
   const [errors, setErrors] = useState({});
 
-  // const handleLogin = async (e) => {
-  //   e.preventDefault();
-
-  //   try {
-  //     const response = await fetch("http://192.168.0.113:8000/api/v1/users/login", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({
-  //         email,
-  //         password,
-  //       }),
-  //     });
-
-  //     const data = await response.json();
-
-  //     if (response.ok) {
-  //       localStorage.setItem("loggedInUser", JSON.stringify(data.user));
-  //       localStorage.setItem("isAuth", "true");
-  //       navigate("/dashboard");
-  //     } else {
-  //       setErrors({ email: data.message || "Invalid credentials" });
-  //     }
-  //   } catch (error) {
-  //     console.error("Login error:", error);
-  //     setErrors({ email: "Server error. Try again later." });
-  //   }
-  // };
-   const handleLogin = (e) => {
+   const handleLogin = async (e) => {
     e.preventDefault();
-
-    const users = JSON.parse(localStorage.getItem("users")) || [];
-    const students = JSON.parse(localStorage.getItem("students")) || [];
-    const teachers = JSON.parse(localStorage.getItem("teachers")) || [];
-
-    const validUser = users.find(
-      (u) => u.email === email && u.password === password
-    );
-    const validStudent = students.find(
-      (u) => u.email === email && u.password === password
-    );
-    const validTeacher = teachers.find(
-      (u) => u.email === email && u.password === password
-    );
-
-    const admin = email === "rehann@gmail.com" && password === "1111";
-
-    if (validUser || validStudent || validTeacher || admin) {
-      localStorage.setItem(
-        "loggedInUser",
-        JSON.stringify(validUser || validStudent || validTeacher)
+    
+    try {
+      const response = await fetch(
+        "http://192.168.0.113:8000/api/v1/users/login",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        }
       );
-      localStorage.setItem("isAuth", "true");
-      navigate("/dashboard");
-    } else {
-      setErrors({ email: "Invalid credentials" });
+
+      const data = await response.json();
+      console.log(data)
+      if (response.ok) {
+        const token = data?.data?.user?.accessToken;
+
+        localStorage.setItem("token", token);
+        localStorage.setItem("loggedInUser", JSON.stringify(data?.data?.user));
+        localStorage.setItem("isAuth", "true");
+
+        navigate("/dashboard"); 
+      } else {
+        setErrors({ email: data.message || "Invalid credentials" });
+      }
+    } catch (error) {
+      console.log("Login error:", error);
+      setErrors({ email: "Server error. Try again later." });
     }
   };
-  useEffect(() => {
-    const isAuth = localStorage.getItem("isAuth");
-    if (isAuth) navigate("/dashboard");
-  }, []);
+  
+  // *********************
+  //  const handleLogin = (e) => {
+  //   e.preventDefault();
+
+  //   const users = JSON.parse(localStorage.getItem("users")) || [];
+  //   const students = JSON.parse(localStorage.getItem("students")) || [];
+  //   const teachers = JSON.parse(localStorage.getItem("teachers")) || [];
+
+  //   const validUser = users.find(
+  //     (u) => u.email === email && u.password === password
+  //   );
+  //   const validStudent = students.find(
+  //     (u) => u.email === email && u.password === password
+  //   );
+  //   const validTeacher = teachers.find(
+  //     (u) => u.email === email && u.password === password
+  //   );
+
+  //   const admin = email === "rehann@gmail.com" && password === "1111";
+
+  //   if (validUser || validStudent || validTeacher || admin) {
+  //     localStorage.setItem(
+  //       "loggedInUser",
+  //       JSON.stringify(validUser || validStudent || validTeacher)
+  //     );
+  //     localStorage.setItem("isAuth", "true");
+  //     navigate("/dashboard");
+  //   } else {
+  //     setErrors({ email: "Invalid credentials" });
+  //   }
+  // };
+  // useEffect(() => {
+  //   const isAuth = localStorage.getItem("isAuth");
+  //   if (isAuth) navigate("/dashboard");
+  // }, []);
 
   return (
     <div style={styles.container}>
@@ -149,6 +153,3 @@ const styles = {
 };
 
 export default Login;
-
-
-

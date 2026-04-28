@@ -21,7 +21,7 @@ const Teacher = () => {
     email: "",
     password: "",
     qualifications: "",
-    number: "",
+    phone: "",
   });
 
   useEffect(() => {
@@ -44,9 +44,9 @@ const Teacher = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleNumberChange = (e) => {
+  const handlephoneChange = (e) => {
     const value = e.target.value.replace(/\D/g, "").slice(0, 10);
-    setForm({ ...form, number: value });
+    setForm({ ...form, phone: value });
   };
 
   const validatePassword = (password) => {
@@ -54,17 +54,17 @@ const Teacher = () => {
 
     let hasUpper = false,
       hasLower = false,
-      hasNumber = false,
+      hasphone = false,
       hasSpecial = false;
 
     for (let char of password) {
       if (char >= "A" && char <= "Z") hasUpper = true;
       else if (char >= "a" && char <= "z") hasLower = true;
-      else if (char >= "0" && char <= "9") hasNumber = true;
+      else if (char >= "0" && char <= "9") hasphone = true;
       else hasSpecial = true;
     }
 
-    return hasUpper && hasLower && hasNumber && hasSpecial;
+    return hasUpper && hasLower && hasphone && hasSpecial;
   };
 
   const handleSubmit = (e) => {
@@ -75,7 +75,7 @@ const Teacher = () => {
     const isDuplicate = teachers.some(
       (t) =>
         (t.email === form.email ||
-          t.number === form.number ||
+          t.phone === form.phone ||
           t.name === form.name ||
           t.password === form.password) &&
         t.id !== form.id,
@@ -103,7 +103,7 @@ const Teacher = () => {
       email: "",
       password: "",
       qualifications: "",
-      number: "",
+      phone: "",
     });
     dialog.close();
   };
@@ -175,13 +175,13 @@ const Teacher = () => {
             required
           />
 
-          <label>Number</label>
+          <label>phone</label>
           <input
             type="tel"
-            name="Number"
-            placeholder="Number."
-            value={form.number}
-            onChange={handleNumberChange}
+            name="phone"
+            placeholder="phone."
+            value={form.phone}
+            onChange={handlephoneChange}
             maxLength="10"
           />
 
@@ -251,7 +251,7 @@ const Teacher = () => {
             <th style={myStyle}>Teacher Email</th>
             <th style={myStyle}>Password</th>
             <th style={myStyle}>Qualifications</th>
-            <th style={myStyle}>Phone Number</th>
+            <th style={myStyle}>Phone</th>
             <th style={myStyle}>Action</th>
           </tr>
         </thead>
@@ -285,7 +285,7 @@ const Teacher = () => {
                 </button>
               </td>
               <td>{t.qualifications}</td>
-              <td>{t.number}</td>
+              <td>{t.phone}</td>
               <td>
                 <button
                   onClick={() => handleEdit(t)}

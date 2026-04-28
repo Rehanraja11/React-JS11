@@ -4,9 +4,9 @@ import { MdDelete } from "react-icons/md";
 import DefaultLayout from "../layout/DefaultLayout";
 import { SiGoogleclassroom } from "react-icons/si";
 
-const Class = () => {
+const Classes = () => {
   const [classes, setClasses] = useState(
-    JSON.parse(localStorage.getItem("classes")) || []
+    JSON.parse(localStorage.getItem("classes")) || [],
   );
 
   const [deleteClass, setDeleteClass] = useState(null);
@@ -17,7 +17,7 @@ const Class = () => {
     className: "",
     classId: "",
     student: "",
-    fees: "", // ✅ ONLY ADDED
+    fees: "",
   });
 
   useEffect(() => {
@@ -35,9 +35,8 @@ const Class = () => {
 
     const isDuplicate = classes.some(
       (c) =>
-        (c.className === form.className ||
-          c.classId === form.classId) &&
-        c.id !== form.id
+        (c.className === form.className || c.classId === form.classId) &&
+        c.id !== form.id,
     );
 
     if (isDuplicate) {
@@ -56,7 +55,7 @@ const Class = () => {
       className: "",
       classId: "",
       student: "",
-      fees: "", // reset
+      fees: "",
     });
 
     dialog.close();
@@ -81,12 +80,11 @@ const Class = () => {
   const filteredClasses = classes.filter(
     (c) =>
       c.className.toLowerCase().includes(searchClass.toLowerCase()) ||
-      c.classId.toLowerCase().includes(searchClass.toLowerCase())
+      c.classId.toLowerCase().includes(searchClass.toLowerCase()),
   );
 
   return (
     <DefaultLayout>
-      {/* Add/Edit Dialog */}
       <dialog id="class-dialog" style={{ padding: "20px" }}>
         <form
           style={{ padding: "20px", background: "#fff" }}
@@ -121,7 +119,6 @@ const Class = () => {
             required
           />
 
-          {/* ✅ ONLY NEW FIELD (NO UI CHANGE) */}
           <label>Class Fees</label>
           <input
             type="number"
@@ -131,25 +128,22 @@ const Class = () => {
             required
           />
 
-          <br /><br />
+          <br />
+          <br />
 
-          <button type="submit">
-            {form.id ? "Update" : "Add"}
-          </button>
+          <button type="submit">{form.id ? "Update" : "Add"}</button>
 
           <button
             type="button"
             style={{ marginLeft: "20px" }}
-            onClick={() =>
-              document.getElementById("class-dialog").close()
-            }
+            onClick={() => document.getElementById("class-dialog").close()}
           >
             Cancel
           </button>
         </form>
       </dialog>
 
-      {/* Header */}
+      
       <div className="flex mt-15 mb-12 items-center justify-between mr-40">
         <h3>Class List</h3>
 
@@ -169,9 +163,7 @@ const Class = () => {
           />
 
           <button
-            onClick={() =>
-              document.getElementById("class-dialog").showModal()
-            }
+            onClick={() => document.getElementById("class-dialog").showModal()}
             style={{
               background: "linear-gradient(135deg, #000000, #333333)",
               color: "#ffffff",
@@ -186,14 +178,14 @@ const Class = () => {
         </div>
       </div>
 
-      {/* TABLE */}
+      
       <table>
         <thead>
           <tr>
             <th style={myStyle}>Class Name</th>
             <th style={myStyle}>Class ID</th>
             <th style={myStyle}>Students</th>
-            <th style={myStyle}>Fees</th> {/* ✅ ONLY ADDED COLUMN */}
+            <th style={myStyle}>Fees</th> 
             <th style={myStyle}>Action</th>
           </tr>
         </thead>
@@ -205,7 +197,7 @@ const Class = () => {
                 <td>{c.className}</td>
                 <td>{c.classId}</td>
                 <td>{c.student}</td>
-                <td>₹ {c.fees}</td> {/* ✅ SHOW FEES */}
+                <td>₹ {c.fees}</td> 
                 <td>
                   <button
                     onClick={() => handleEdit(c)}
@@ -240,18 +232,14 @@ const Class = () => {
         </tbody>
       </table>
 
-      
       <dialog id="delete-class-dialog" style={{ padding: "20px" }}>
         <h3>Delete Class</h3>
         <p>
-          Are you sure you want to delete{" "}
-          <b>{deleteClass?.className}</b>?
+          Are you sure you want to delete <b>{deleteClass?.className}</b>?
         </p>
         <button onClick={confirmDelete}>Delete</button>
         <button
-          onClick={() =>
-            document.getElementById("delete-class-dialog").close()
-          }
+          onClick={() => document.getElementById("delete-class-dialog").close()}
         >
           Cancel
         </button>
@@ -262,4 +250,4 @@ const Class = () => {
 
 const myStyle = { color: "Gray", fontWeight: "550" };
 
-export default Class;
+export default Classes;

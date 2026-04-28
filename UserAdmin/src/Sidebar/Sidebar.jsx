@@ -18,7 +18,7 @@ const Sidebar = () => {
         <Link className="mb-4" to = "/student"><PiStudentFill className="mt-[3.2px]" /><span className="ml-2">STUDENT</span></Link>
         <Link className="mb-4" to = "/teacher"><GiTeacher className="mt-[3.2px]"/><span className="ml-2">TEACHER</span></Link>
         <Link className="mb-4" to = "/subject"><IoBookSharp className="mt-[3.2px]" /><span className="ml-2">SUBJECT</span></Link>
-        <Link className="mb-4" to = "/class"><SiGoogleclassroom  className="mt-[3.2px]" /><span className="ml-2">CLASS</span></Link>
+        <Link className="mb-4" to = "/classes"><SiGoogleclassroom  className="mt-[3.2px]" /><span className="ml-2">CLASSES</span></Link>
         <Link className="mb-4" to = "/fees"><FcMoneyTransfer    className="mt-[3.2px]" /><span className="ml-2">FEES</span></Link>
       </ul>     
     </div>
