@@ -5,7 +5,7 @@ import { FaRegEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import DefaultLayout from "../layout/DefaultLayout";
 import { GiTeacher } from "react-icons/gi";
-
+import axios from "axios";
 const Teacher = () => {
   const [teachers, setTeachers] = useState(
     JSON.parse(localStorage.getItem("teachers")) || [],
@@ -20,7 +20,7 @@ const Teacher = () => {
     name: "",
     email: "",
     password: "",
-    qualifications: "",
+    qualification: "",
     phone: "",
   });
 
@@ -49,64 +49,50 @@ const Teacher = () => {
     setForm({ ...form, phone: value });
   };
 
-  const validatePassword = (password) => {
-    if (password.length < 8) return false;
+  
 
-    let hasUpper = false,
-      hasLower = false,
-      hasphone = false,
-      hasSpecial = false;
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  const token = localStorage.getItem("token");
 
-    for (let char of password) {
-      if (char >= "A" && char <= "Z") hasUpper = true;
-      else if (char >= "a" && char <= "z") hasLower = true;
-      else if (char >= "0" && char <= "9") hasphone = true;
-      else hasSpecial = true;
-    }
-
-    return hasUpper && hasLower && hasphone && hasSpecial;
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    const dialog = document.getElementById("teacher-dialog");
-
-    const isDuplicate = teachers.some(
-      (t) =>
-        (t.email === form.email ||
-          t.phone === form.phone ||
-          t.name === form.name ||
-          t.password === form.password) &&
-        t.id !== form.id,
+  try {
+    const res = await axios.post(
+      "http://192.168.0.113:8000/api/v1/users/create-teacher",
+      form,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
     );
 
-    if (isDuplicate) {
-      alert("Duplicate data found!");
-      return;
-    }
+    console.log("Response:", res.data);
 
-    if (!validatePassword(form.password)) {
-      alert("Weak password!");
-      return;
-    }
+  
+    const newTeacher = {
+      ...form,
+      id: Date.now(), 
+    };
 
-    if (form.id) {
-      setTeachers(teachers.map((s) => (s.id === form.id ? form : s)));
-    } else {
-      setTeachers([...teachers, { ...form, id: Date.now() }]);
-    }
+    setTeachers((prev) => [...prev, newTeacher]);
 
+   
     setForm({
       id: null,
       name: "",
       email: "",
       password: "",
-      qualifications: "",
+      qualification: "",
       phone: "",
     });
-    dialog.close();
-  };
+
+    document.getElementById("teacher-dialog").close();
+
+  } catch (err) {
+    console.error("ERROR:", err.response?.data);
+  }
+};
 
   const handleEdit = (teacher) => {
     setForm(teacher);
@@ -124,9 +110,10 @@ const Teacher = () => {
     document.getElementById("delete-teacher-dialog").close();
   };
 
-   const filteredTeacher = teachers.filter((t) =>
-    t.name.toLowerCase().includes(searchTeacher.toLowerCase())||
-    t.email.includes(searchTeacher),
+  const filteredTeacher = teachers.filter(
+    (t) =>
+      t.name.toLowerCase().includes(searchTeacher.toLowerCase()) ||
+      t.email.includes(searchTeacher),
   );
 
   return (
@@ -165,12 +152,12 @@ const Teacher = () => {
             onChange={handleChange}
             required
           />
-          <label>Qualifications</label>
+          <label>qualification</label>
           <input
             type="text"
-            name="qualifications"
-            placeholder="Qualifications"
-            value={form.qualifications}
+            name="qualification"
+            placeholder="qualification"
+            value={form.qualification}
             onChange={handleChange}
             required
           />
@@ -196,51 +183,45 @@ const Teacher = () => {
         </form>
       </dialog>
 
-      
-
       <div className="flex mt-15 mb-12 items-center justify-between mr-40">
-        
-        <h3 >
-         
-          Teacher List
-        </h3>
-        
+        <h3>Teacher List</h3>
         <div>
-        <input
-          type="text"
-          placeholder="🔍 Search Teacher"
-          value={searchTeacher}
-          onChange={(e) => setSearchTeacher(e.target.value)}
-          style={{
-            padding: "8px",
-            width: "250px",
-            borderRadius: "9px",
-            border: "1px solid #120325",
-            fontSize: "1.1rem",
-            lineHeight: "1.9rem",
-            outline: "none",
-            marginRight:"19px"
-          }}
-        />
-      
-        <button
-          onClick={() => document.getElementById("teacher-dialog").showModal()}
-          style={{
-            background: "linear-gradient(135deg, #000000, #333333)",
-            color: "#ffffff",
-            padding: "13px",
-            borderRadius: "8px",
-            border: "none",
-            fontSize: "16px",
-            fontWeight: "600",
-            cursor: "pointer",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
-            transition: "all 0.3s ease",
-          }}
-        >
-          Add Teachers
-          <GiTeacher />
-        </button>
+          <input
+            type="text"
+            placeholder="🔍 Search Teacher"
+            value={searchTeacher}
+            onChange={(e) => setSearchTeacher(e.target.value)}
+            style={{
+              padding: "8px",
+              width: "250px",
+              borderRadius: "9px",
+              border: "1px solid #120325",
+              fontSize: "1.1rem",
+              lineHeight: "1.9rem",
+              outline: "none",
+              marginRight: "19px",
+            }}
+          />
+          <button
+            onClick={() =>
+              document.getElementById("teacher-dialog").showModal()
+            }
+            style={{
+              background: "linear-gradient(135deg, #000000, #333333)",
+              color: "#ffffff",
+              padding: "13px",
+              borderRadius: "8px",
+              border: "none",
+              fontSize: "16px",
+              fontWeight: "600",
+              cursor: "pointer",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+              transition: "all 0.3s ease",
+            }}
+          >
+            Add Teachers
+            <GiTeacher />
+          </button>
         </div>
       </div>
 
@@ -250,7 +231,7 @@ const Teacher = () => {
             <th style={myStyle}>Teacher Name</th>
             <th style={myStyle}>Teacher Email</th>
             <th style={myStyle}>Password</th>
-            <th style={myStyle}>Qualifications</th>
+            <th style={myStyle}>qualification</th>
             <th style={myStyle}>Phone</th>
             <th style={myStyle}>Action</th>
           </tr>
@@ -284,7 +265,7 @@ const Teacher = () => {
                   <IoMdCopy />
                 </button>
               </td>
-              <td>{t.qualifications}</td>
+              <td>{t.qualification}</td>
               <td>{t.phone}</td>
               <td>
                 <button

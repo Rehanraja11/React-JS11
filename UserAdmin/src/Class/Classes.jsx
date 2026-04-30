@@ -3,6 +3,7 @@ import { FaRegEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import DefaultLayout from "../layout/DefaultLayout";
 import { SiGoogleclassroom } from "react-icons/si";
+import axios from "axios";
 
 const Classes = () => {
   const [classes, setClasses] = useState(
@@ -28,8 +29,31 @@ const Classes = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const token = localStorage.getItem("token");
+
+    try {
+      const res = await axios.post(
+        "http://192.168.0.113:8000/api/v1/users/create-classes",
+        {
+          className: form.className,
+          classId: form.classId,
+          student: Number(form.student),
+          fees: Number(form.fees),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        },
+      );
+      console.log("Response:", res.data);
+    } catch (err) {
+      console.error("ERROR:", err.response?.data);
+    }
 
     const dialog = document.getElementById("class-dialog");
 
@@ -143,7 +167,6 @@ const Classes = () => {
         </form>
       </dialog>
 
-      
       <div className="flex mt-15 mb-12 items-center justify-between mr-40">
         <h3>Class List</h3>
 
@@ -178,14 +201,13 @@ const Classes = () => {
         </div>
       </div>
 
-      
       <table>
         <thead>
           <tr>
             <th style={myStyle}>Class Name</th>
             <th style={myStyle}>Class ID</th>
             <th style={myStyle}>Students</th>
-            <th style={myStyle}>Fees</th> 
+            <th style={myStyle}>Fees</th>
             <th style={myStyle}>Action</th>
           </tr>
         </thead>
@@ -197,7 +219,7 @@ const Classes = () => {
                 <td>{c.className}</td>
                 <td>{c.classId}</td>
                 <td>{c.student}</td>
-                <td>₹ {c.fees}</td> 
+                <td>₹ {c.fees}</td>
                 <td>
                   <button
                     onClick={() => handleEdit(c)}

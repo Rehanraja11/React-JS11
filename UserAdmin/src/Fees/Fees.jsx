@@ -281,7 +281,7 @@ const Fees = () => {
             ))}
           </select>
 
-          <input value={form.class} disabled placeholder="Class" />
+          <input value={form.classes} disabled placeholder="Class" />
           <input value={form.totalFee} disabled placeholder="Total Fee" />
 
           <input

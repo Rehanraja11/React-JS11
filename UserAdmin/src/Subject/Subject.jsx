@@ -3,6 +3,7 @@ import { FaRegEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import DefaultLayout from "../layout/DefaultLayout";
 import { IoBookSharp } from "react-icons/io5";
+import axios from "axios";
 
 const Subject = () => {
   const [subjects, setSubjects] = useState(
@@ -26,8 +27,30 @@ const Subject = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const token = localStorage.getItem("token");
+
+    try {
+      const res = await axios.post(
+        "http://192.168.0.113:8000/api/v1/users/create-subject",
+        {
+          name: form.subjectName, 
+          semester: form.semester,
+          instructor: form.instructor,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        },
+      );
+      console.log("Response:", res.data);
+    } catch (err) {
+      console.error("ERROR:", err.response?.data);
+    }
 
     const dialog = document.getElementById("subject-dialog");
 
