@@ -9,13 +9,10 @@ import { MdDashboard } from "react-icons/md";
 import axios from "axios";
 
 const Dashboard = () => {
-  const [users, setUsers] = useState(
-    JSON.parse(localStorage.getItem("users")) || [],
-  );
+  const [users, setUsers] = useState([]);
   const [showPassword, setShowPassword] = useState({});
   const [deleteUser, setDeleteUser] = useState(null);
   const [searchUser, setSearchUser] = useState("");
-
   const [form, setForm] = useState({
     id: null,
     name: "",
@@ -30,31 +27,49 @@ const Dashboard = () => {
     password: "",
     phone: "",
   });
+  const fetchUsers = async () => {
+  const token = localStorage.getItem("token");
+  try {
+    const res = await axios.get(
+      "http://192.168.0.113:8000/api/v1/users/all-users",
+      { 
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    console.log("FULL API RESPONSE:", res.data);
+    let usersData = [];
+
+    if (Array.isArray(res.data)) {
+      usersData = res.data;
+    } else if (Array.isArray(res.data?.data)) {
+      usersData = res.data.data;
+    } else if (Array.isArray(res.data?.data?.users)) {
+      usersData = res.data.data.users;
+    } else if (Array.isArray(res.data?.users)) {
+      usersData = res.data.users;
+    }
+    setUsers(usersData);
+  } catch (err) {
+    console.error(err.response?.data || err);
+    setUsers([]);
+  }
+};
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect 
+    fetchUsers();
+  }, []);
 
   const handleCopyPassword = (password) => {
-    navigator.clipboard
-      .writeText(password)
-      .then(() => {
-        alert("Password copied to clipboard!");
-      })
-      .catch(() => {
-        alert("Failed to copy password.");
-      });
+    navigator.clipboard.writeText(password);
+    alert("Password copied to clipboard!");
   };
-
   const togglePassword = (id) => {
     setShowPassword((prev) => ({
       ...prev,
       [id]: !prev[id],
     }));
-  };
-
-  const confirmDeleteUser = () => {
-    setUsers(users.filter((u) => u.id !== deleteUser.id));
-    setDeleteUser(null);
-
-    const dialog = document.getElementById("delete-dialog");
-    dialog.close();
   };
 
   useEffect(() => {
@@ -67,135 +82,101 @@ const Dashboard = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-   
-    try {
-      const res = await axios.post(
-        "http://192.168.0.113:8000/api/v1/users/register",
-        form,
-      );
-      console.log(res.data);
-    } catch (err) {
-      console.error(err);
-    }
 
-    const dialog = document.getElementById("demo-dialog-form");
-
-    let newErrors = {
-      name: "",
-      email: "",
-      password: "",
-      phone: "",
-    };
-
-    const isDuplicatephone = users.some(
-      (u) => u.phone === form.phone && u.id !== form.id,
-    );
+    let newErrors = { name: "", email: "", password: "", phone: "" };
 
     const isDuplicateEmail = users.some(
       (u) => u.email === form.email && u.id !== form.id,
     );
 
-    const isDuplicatePass = users.some(
-      (u) => u.password === form.password && u.id !== form.id,
+    const isDuplicatePhone = users.some(
+      (u) => u.phone === form.phone && u.id !== form.id,
     );
 
-    const isDuplicateName = users.some(
-      (u) => u.name === form.name && u.id !== form.id,
-    );
-
-    const validatePassword = (password) => {
-      if (password.length < 8) return false;
-
-      let hasUpper = false;
-      let hasLower = false;
-      let hasphone = false;
-      let hasSpecial = false;
-
-      for (let char of password) {
-        if (char >= "A" && char <= "Z") hasUpper = true;
-        else if (char >= "a" && char <= "z") hasLower = true;
-        else if (char >= "0" && char <= "9") hasphone = true;
-        else hasSpecial = true;
-      }
-
-      return hasUpper && hasLower && hasphone && hasSpecial;
-    };
-
-    if (isDuplicateName) {
-      newErrors.name = "Name already exists";
-    }
-
-    if (isDuplicateEmail) {
-      newErrors.email = "Email already exists";
-    }
-
-    if (isDuplicatephone) {
-      newErrors.phone = "phone already exists";
-    }
-
-    if (form.phone.length !== 10) {
-      newErrors.phone = "phone must be 10 digits";
-    }
-
-    if (isDuplicatePass) {
-      newErrors.password = "Password already exists";
-    }
-
-    if (!validatePassword(form.password)) {
-      newErrors.password =
-        "Min 8 chars with uppercase, lowercase, phone & special char";
-    }
+    if (isDuplicateEmail) newErrors.email = "Email already exists";
+    if (isDuplicatePhone) newErrors.phone = "Phone already exists";
 
     setErrors(newErrors);
 
-    if (Object.values(newErrors).some((err) => err !== "")) {
-      return;
+    if (Object.values(newErrors).some((err) => err)) return;
+
+    const token = localStorage.getItem("token");
+    try {
+      if (form.id) {
+        await axios.put(
+          `http://192.168.0.113:8000/api/v1/user-update`,
+          {
+            id: form.id,
+            name: form.name,
+            email: form.email,
+            phone: form.phone,
+          },
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        );
+      } else {
+        await axios.post(
+          "http://192.168.0.113:8000/api/v1/users/register",
+          form,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        );
+      }
+      await fetchUsers();
+      setForm({
+        id: null,
+        name: "",
+        email: "",
+        password: "",
+        phone: "",
+      });
+      document.getElementById("demo-dialog-form").close();
+    } catch (err) {
+      console.error(err.response?.data || err.message);
     }
-
-    if (form.id) {
-      setUsers(users.map((u) => (u.id === form.id ? form : u)));
-    } else {
-      setUsers([...users, { ...form, id: Date.now() }]);
-    }
-
-    setForm({
-      id: null,
-      name: "",
-      email: "",
-      password: "",
-      phone: "",
-    });
-
-    setErrors({
-      name: "",
-      email: "",
-      password: "",
-      phone: "",
-    });
-
-    dialog.close();
   };
   const handlephoneChange = (e) => {
     const value = e.target.value.replace(/\D/g, "").slice(0, 10);
     setForm({ ...form, phone: value });
   };
-
   const handleDelete = (user) => {
     setDeleteUser(user);
     const dialog = document.getElementById("delete-dialog");
     dialog.showModal();
   };
   const handleEdit = (user) => {
-    setForm(user);
-
-    const dialog = document.getElementById("demo-dialog-form");
-    dialog.showModal();
+    setForm({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      password: "",
+      phone: user.phone,
+    });
+    document.getElementById("demo-dialog-form").showModal();
   };
+  const confirmDeleteUser = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      await axios.delete(
+        `http://192.168.0.113:8000/api/v1/users/delete/${deleteUser.id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+      await fetchUsers();
+      setDeleteUser(null);
 
+      document.getElementById("delete-dialog").close();
+    } catch (err) {
+      console.error(err.response?.data || err);
+    }
+  };
   const filteredUser = users.filter(
-    (t) =>
-      t.name.toLowerCase().includes(searchUser.toLowerCase()) ||
-      t.email.includes(searchUser),
+    (u) =>
+      (u.name || "").toLowerCase().includes(searchUser.toLowerCase()) ||
+      (u.email || "").toLowerCase().includes(searchUser.toLowerCase()),
   );
   return (
     <DefaultLayout>
@@ -206,10 +187,10 @@ const Dashboard = () => {
           alignItems: "center",
         }}
       ></div>
-      <dialog id="demo-dialog-form" onSubmit={handleSubmit}>
-        <form method="dialog">
+      <dialog id="demo-dialog-form">
+        <form onSubmit={handleSubmit}>
           <header>
-            <h3>Add</h3>
+            <h3>{form.id ? "Edit User" : "Add User"}</h3>
           </header>
           <div>
             <input
@@ -221,7 +202,6 @@ const Dashboard = () => {
               required
             />
             {errors.name && <p className="error">{errors.name}</p>}
-
             <input
               type="email"
               name="email"
@@ -231,7 +211,6 @@ const Dashboard = () => {
               required
             />
             {errors.email && <p className="error">{errors.email}</p>}
-
             <input
               type="password"
               name="password"
@@ -241,7 +220,6 @@ const Dashboard = () => {
               required
             />
             {errors.password && <p className="error">{errors.password}</p>}
-
             <input
               type="tel"
               name="phone"
@@ -258,7 +236,7 @@ const Dashboard = () => {
               type="button"
               commandfor="demo-dialog-form"
               command="close"
-              class="outline"
+              className="outline"
             >
               Cancel
             </button>
@@ -268,7 +246,6 @@ const Dashboard = () => {
           </footer>
         </form>
       </dialog>
-
       <div className="flex mt-15 mb-12 items-center justify-between mr-40">
         <h3>User List</h3>
         <div>
@@ -311,6 +288,7 @@ const Dashboard = () => {
       <table>
         <thead>
           <tr>
+            <th style={myStyle}>Id</th>
             <th style={myStyle}>Name</th>
             <th style={myStyle}>Email</th>
             <th style={myStyle}>Password</th>
@@ -321,6 +299,7 @@ const Dashboard = () => {
         <tbody style={{}}>
           {filteredUser.map((user) => (
             <tr key={user.id}>
+              <td>{user.id}</td>
               <td>{user.name}</td>
               <td>{user.email}</td>
               <td style={{ display: "flex", alignItems: "center" }}>
@@ -374,7 +353,6 @@ const Dashboard = () => {
           ))}
         </tbody>
       </table>
-
       <dialog id="delete-dialog">
         <div style={{ padding: "20px", minWidth: "300px" }}>
           <h3>Delete User</h3>
@@ -389,10 +367,10 @@ const Dashboard = () => {
             }}
           >
             <button
-              onClick={() => {
-                document.getElementById("delete-dialog").close();
-                setDeleteUser(null);
-              }}
+              type="button"
+              onClick={() =>
+                document.getElementById("demo-dialog-form").close()
+              }
               className="outline"
             >
               Cancel
@@ -407,3 +385,7 @@ const Dashboard = () => {
 };
 const myStyle = { color: "Gray", fontWeight: "550" };
 export default Dashboard;
+
+
+
+

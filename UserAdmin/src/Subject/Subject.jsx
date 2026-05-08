@@ -6,37 +6,70 @@ import { IoBookSharp } from "react-icons/io5";
 import axios from "axios";
 
 const Subject = () => {
-  const [subjects, setSubjects] = useState(
-    JSON.parse(localStorage.getItem("subjects")) || [],
-  );
-  const [deleteSubject, setDeleteSubject] = useState(null);
-  const [searchSubject, setSearchSubject] = useState("");
+  const [subjects, setSubjects] = useState([]);
+const [deleteSubject, setDeleteSubject] = useState(null);
+const [searchSubject, setSearchSubject] = useState("");
 
-  const [form, setForm] = useState({
-    id: null,
-    subjectName: "",
-    semester: "",
-    instructor: "",
-  });
+const [form, setForm] = useState({
+  s_id: null,
+  name: "",
+  semester: "",
+  instructor: "",
+});
 
-  useEffect(() => {
-    localStorage.setItem("subjects", JSON.stringify(subjects));
-  }, [subjects]);
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+const fetchSubjects = async () => {
+  const token = localStorage.getItem("token");
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  try {
+    const res = await axios.get(
+      "http://192.168.0.113:8000/api/v1/users/all-subjects",
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
 
-    const token = localStorage.getItem("token");
+    setSubjects(res.data.data || res.data);
+  } catch (err) {
+    console.error("GET ERROR:", err.response?.data || err);
+  }
+};
 
-    try {
-      const res = await axios.post(
+useEffect(() => {
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  fetchSubjects();
+}, []);
+
+
+const handleChange = (e) => {
+  setForm({ ...form, [e.target.name]: e.target.value });
+};
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  const token = localStorage.getItem("token");
+
+  try {
+    if (form.s_id) {
+     
+      await axios.put(
+        "http://192.168.0.113:8000/api/v1/users/update-subject",
+        {
+          s_id: form.s_id,
+          name: form.name,
+          semester: form.semester,
+          instructor: form.instructor,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+    } else {
+     
+      await axios.post(
         "http://192.168.0.113:8000/api/v1/users/create-subject",
         {
-          name: form.subjectName, 
+          name: form.name,
           semester: form.semester,
           instructor: form.instructor,
         },
@@ -45,62 +78,71 @@ const Subject = () => {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-        },
+        }
       );
-      console.log("Response:", res.data);
-    } catch (err) {
-      console.error("ERROR:", err.response?.data);
     }
 
-    const dialog = document.getElementById("subject-dialog");
-
-    const isDuplicate = subjects.some(
-      (s) =>
-        (s.subjectName === form.subjectName ||
-          s.instructor === form.instructor) &&
-        s.id !== form.id,
-    );
-
-    if (isDuplicate) {
-      alert("Duplicate subject data found!");
-      return;
-    }
-
-    if (form.id) {
-      setSubjects(subjects.map((s) => (s.id === form.id ? form : s)));
-    } else {
-      setSubjects([...subjects, { ...form, id: Date.now() }]);
-    }
+    await fetchSubjects();
 
     setForm({
-      id: null,
-      subjectName: "",
+      s_id: null,
+      name: "",
       semester: "",
       instructor: "",
     });
-    dialog.close();
-  };
-  const handleEdit = (subject) => {
-    setForm(subject);
-    document.getElementById("subject-dialog").showModal();
-  };
 
-  const handleDelete = (subject) => {
-    setDeleteSubject(subject);
-    document.getElementById("delete-subject-dialog").showModal();
-  };
+    document.getElementById("subject-dialog").close();
+  } catch (err) {
+    console.error("ERROR:", err.response?.data || err);
+  }
+};
 
-  const confirmDelete = () => {
-    setSubjects(subjects.filter((s) => s.id !== deleteSubject.id));
+const handleEdit = (subject) => {
+  setForm({
+    s_id: subject.s_id,
+    name: subject.name || subject.name,
+    semester: subject.semester,
+    instructor: subject.instructor,
+  });
+
+  document.getElementById("subject-dialog").showModal();
+};
+
+const handleDelete = (subject) => {
+  setDeleteSubject(subject);
+  document.getElementById("delete-subject-dialog").showModal();
+};
+
+const confirmDelete = async () => {
+  const token = localStorage.getItem("token");
+
+  try {
+    await axios.delete(
+      "http://192.168.0.113:8000/api/v1/users/delete-subject",
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        data: { s_id: deleteSubject?.s_id },
+      }
+    );
+
+    await fetchSubjects();
     setDeleteSubject(null);
-    document.getElementById("delete-subject-dialog").close();
-  };
 
-  const filteredStudents = subjects.filter(
-    (s) =>
-      s.subjectName.toLowerCase().includes(searchSubject.toLowerCase()) ||
-      s.semester.toLowerCase().includes(searchSubject.toLowerCase()),
-  );
+    document.getElementById("delete-subject-dialog").close();
+  } catch (err) {
+    console.error("DELETE ERROR:", err.response?.data || err);
+  }
+};
+
+const filteredSubjects = subjects.filter(
+  (s) =>
+    (s.name || s.name || "")
+      .toLowerCase()
+      .includes(searchSubject.toLowerCase()) ||
+    (s.semester || "")
+      .toLowerCase()
+      .includes(searchSubject.toLowerCase())
+);
 
   return (
     <DefaultLayout>
@@ -113,8 +155,8 @@ const Subject = () => {
           <label>Subject Name</label>
           <input
             type="text"
-            name="subjectName"
-            value={form.subjectName}
+            name="name"
+            value={form.name}
             onChange={handleChange}
             required
           />
@@ -187,16 +229,17 @@ const Subject = () => {
       <table>
         <thead>
           <tr>
-            <th style={myStyle}>Subject Name</th>
+            <th style={myStyle}>Subject id</th>
             <th style={myStyle}>Semester</th>
             <th style={myStyle}>Instructor</th>
             <th style={myStyle}>Action</th>
           </tr>
         </thead>
         <tbody>
-          {filteredStudents.map((s) => (
-            <tr key={s.id}>
-              <td>{s.subjectName}</td>
+          {filteredSubjects.map((s) => (
+            <tr key={s.s_id}>
+              <td>{s.s_id}</td>
+              <td>{s.name}</td>
               <td>{s.semester}</td>
               <td>{s.instructor}</td>
               <td>
@@ -229,7 +272,7 @@ const Subject = () => {
       <dialog id="delete-subject-dialog" style={{ padding: "20px" }}>
         <h3>Delete Subject</h3>
         <p>
-          Are you sure you want to delete <b>{deleteSubject?.subjectName}</b>?
+          Are you sure you want to delete <b>{deleteSubject?.name}</b>?
         </p>
         <button onClick={confirmDelete}>Delete</button>
         <button

@@ -8,7 +8,7 @@ function DefaultLayout({ children }) {
     <div>
       <Header/>
       <div className="flex">
-        <div className="w-64 mr-10">
+        <div className="w-64 mr-10 ">
           <Sidebar className="p-6" />
         </div>
         <div className=" overflow-x-auto ">{children}</div>

@@ -6,106 +6,148 @@ import { SiGoogleclassroom } from "react-icons/si";
 import axios from "axios";
 
 const Classes = () => {
-  const [classes, setClasses] = useState(
-    JSON.parse(localStorage.getItem("classes")) || [],
-  );
+  const [classes, setClasses] = useState([]);
+const [deleteClass, setDeleteClass] = useState(null);
+const [searchClass, setSearchClass] = useState("");
 
-  const [deleteClass, setDeleteClass] = useState(null);
-  const [searchClass, setSearchClass] = useState("");
+const [form, setForm] = useState({
+  c_id: null,
+  className: "",
+  classId: "",
+  student: "",
+  fees: "",
+});
 
-  const [form, setForm] = useState({
-    id: null,
-    className: "",
-    classId: "",
-    student: "",
-    fees: "",
-  });
 
-  useEffect(() => {
-    localStorage.setItem("classes", JSON.stringify(classes));
-  }, [classes]);
+const fetchClasses = async () => {
+  const token = localStorage.getItem("token");
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const token = localStorage.getItem("token");
-
-    try {
-      const res = await axios.post(
-        "http://192.168.0.113:8000/api/v1/users/create-classes",
-        {
-          className: form.className,
-          classId: form.classId,
-          student: Number(form.student),
-          fees: Number(form.fees),
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        },
-      );
-      console.log("Response:", res.data);
-    } catch (err) {
-      console.error("ERROR:", err.response?.data);
-    }
-
-    const dialog = document.getElementById("class-dialog");
-
-    const isDuplicate = classes.some(
-      (c) =>
-        (c.className === form.className || c.classId === form.classId) &&
-        c.id !== form.id,
+  try {
+    const res = await axios.get(
+      "http://192.168.0.113:8000/api/v1/users/all-classes",
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
     );
 
-    if (isDuplicate) {
-      alert("Duplicate class data found!");
-      return;
+    setClasses(res.data.data || res.data);
+  } catch (err) {
+    console.error("GET ERROR:", err.response?.data || err);
+  }
+};
+
+useEffect(() => {
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  fetchClasses();
+}, []);
+
+
+const handleChange = (e) => {
+  setForm({ ...form, [e.target.name]: e.target.value });
+};
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  const token = localStorage.getItem("token");
+
+  try {
+    if (form.c_id) {
+      // UPDATE
+      await axios.put(
+        "http://192.168.0.113:8000/api/v1/users/update-classes",
+        {
+          c_id: form.c_id,
+          class_id: form.classId,
+          name: form.className,
+          totalStudents: form.student,
+          classFees: form.fees,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+    } else {
+      
+      await axios.post(
+        "http://192.168.0.113:8000/api/v1/users/create-classes",
+        {
+          name: form.className,
+          class_id: form.classId,
+          student: form.student,
+          fees: form.fees,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
     }
 
-    if (form.id) {
-      setClasses(classes.map((c) => (c.id === form.id ? form : c)));
-    } else {
-      setClasses([...classes, { ...form, id: Date.now() }]);
-    }
+    await fetchClasses();
 
     setForm({
-      id: null,
+      c_id: null,
       className: "",
       classId: "",
       student: "",
       fees: "",
     });
 
-    dialog.close();
-  };
+    document.getElementById("class-dialog").close();
+  } catch (err) {
+    console.error("ERROR:", err.response?.data || err);
+  }
+};
 
-  const handleEdit = (cls) => {
-    setForm(cls);
-    document.getElementById("class-dialog").showModal();
-  };
 
-  const handleDelete = (cls) => {
-    setDeleteClass(cls);
-    document.getElementById("delete-class-dialog").showModal();
-  };
+const handleEdit = (cls) => {
+  setForm({
+    c_id: cls.c_id,
+    className: cls.className || cls.name,
+    classId: cls.classId || cls.class_id,
+    student: cls.student,
+    fees: cls.fees,
+  });
 
-  const confirmDelete = () => {
-    setClasses(classes.filter((c) => c.id !== deleteClass.id));
+  document.getElementById("class-dialog").showModal();
+};
+
+
+const handleDelete = (cls) => {
+  setDeleteClass(cls);
+  document.getElementById("delete-class-dialog").showModal();
+};
+
+const confirmDelete = async () => {
+  const token = localStorage.getItem("token");
+
+  try {
+    await axios.delete(
+      "http://192.168.0.113:8000/api/v1/users/delete-classes",
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        data: { c_id: deleteClass?.c_id },
+      }
+    );
+
+    await fetchClasses();
     setDeleteClass(null);
-    document.getElementById("delete-class-dialog").close();
-  };
 
-  const filteredClasses = classes.filter(
-    (c) =>
-      c.className.toLowerCase().includes(searchClass.toLowerCase()) ||
-      c.classId.toLowerCase().includes(searchClass.toLowerCase()),
-  );
+    document.getElementById("delete-class-dialog").close();
+  } catch (err) {
+    console.error("DELETE ERROR:", err.response?.data || err);
+  }
+};
+
+
+const filteredClasses = classes.filter(
+  (c) =>
+    (c.className || c.name || "")
+      .toLowerCase()
+      .includes(searchClass.toLowerCase()) ||
+    (c.classId || c.class_id || "")
+      .toLowerCase()
+      .includes(searchClass.toLowerCase())
+);
 
   return (
     <DefaultLayout>
@@ -216,8 +258,8 @@ const Classes = () => {
           {filteredClasses.length > 0 ? (
             filteredClasses.map((c) => (
               <tr key={c.id}>
-                <td>{c.className}</td>
-                <td>{c.classId}</td>
+                <td>{c.name}</td>
+                <td>{c.class_id}</td>
                 <td>{c.student}</td>
                 <td>₹ {c.fees}</td>
                 <td>

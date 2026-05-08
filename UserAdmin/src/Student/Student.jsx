@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { IoMdCopy } from "react-icons/io";
 import { FaRegEdit } from "react-icons/fa";
@@ -10,17 +10,14 @@ import { IoSearch } from "react-icons/io5";
 import axios from "axios";
 
 const Student = () => {
-  const [students, setStudents] = useState(
-    JSON.parse(localStorage.getItem("students")) || [],
-  );
-
+  const [students, setStudents] = useState([]);
   const [search, setSearch] = useState("");
   const [classFilter, setClassFilter] = useState("");
-
   const [deleteStudent, setDeleteStudent] = useState(null);
+  const [viewStudent, setViewStudent] = useState(null);
 
   const [form, setStudentForm] = useState({
-    id: null,
+    stu_id: null,
     name: "",
     email: "",
     password: "",
@@ -30,110 +27,145 @@ const Student = () => {
     address: "",
     city: "",
   });
-  const [errors, setErrors] = useState({});
-  const [viewStudent, setViewStudent] = useState(null);
+
+  const token = React.useMemo(() => localStorage.getItem("token"), []);
+
+  const fetchStudents = useCallback(async () => {
+    try {
+      const res = await axios.get(
+        "http://192.168.0.113:8000/api/v1/users/all-students",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+
+      setStudents(res.data.data);
+    } catch (err) {
+      console.error(err);
+    }
+  }, [token]);
+
   useEffect(() => {
-    localStorage.setItem("students", JSON.stringify(students));
-  }, [students]);
-  const handleView = (student) => {
-    setViewStudent(student);
-    document.getElementById("view-student-dialog").showModal();
-  };
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchStudents();
+  }, [fetchStudents]);
+
   const handleChange = (e) => {
     setStudentForm({ ...form, [e.target.name]: e.target.value });
   };
+
   const handlephoneChange = (e) => {
     const value = e.target.value.replace(/\D/g, "").slice(0, 10);
     setStudentForm({ ...form, phone: value });
   };
-  const validatePassword = (password) => {
-    if (password.length < 8) return false;
-    let hasUpper = false,
-      hasLower = false,
-      hasphone = false,
-      hasSpecial = false;
-    for (let char of password) {
-      if (char >= "A" && char <= "Z") hasUpper = true;
-      else if (char >= "a" && char <= "z") hasLower = true;
-      else if (char >= "0" && char <= "9") hasphone = true;
-      else hasSpecial = true;
-    }
-    return hasUpper && hasLower && hasphone && hasSpecial;
-  };
+
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    const token = localStorage.getItem("token");
-
-    try {
-      const res = await axios.post(
-        "http://192.168.0.113:8000/api/v1/users/create-student",
-        form,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-      console.log(res.data);
-    } catch (err) {
-      console.error(err);
-    }
-
-    const dialog = document.getElementById("student-dialog");
-    const isDuplicate = students.some(
-      (s) =>
-        (s.email === form.email ||
-          s.phone === form.phone ||
-          s.name === form.name ||
-          s.password === form.password) &&
-        s.id !== form.id,
-    );
-    if (isDuplicate) {
-      alert("Duplicate data found!");
-      return;
-    }
-    if (!validatePassword(form.password)) {
-      setErrors({ password: "Weak Password" });
-      return;
-    }
-    if (form.id) {
-      setStudents(students.map((s) => (s.id === form.id ? form : s)));
-    } else {
-      setStudents([...students, { ...form, id: Date.now() }]);
-    }
-    setStudentForm({
-      id: null,
-      name: "",
-      email: "",
-      password: "",
-      phone: "",
-      classes: "",
-      dob: "",
-      address: "",
-      city: "",
+    console.log("UPDATE PAYLOAD:", {
+      ...form,
+      id: form.stu_id,
     });
-    dialog.close();
+    e.preventDefault();
+    console.log("Sending Data:", form);
+    try {
+      if (form.stu_id) {
+        await axios.put(
+          "http://192.168.0.113:8000/api/v1/users/update-student",
+          {
+            ...form,
+            id: form.stu_id,
+          },
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        );
+      } else {
+        await axios.post(
+          "http://192.168.0.113:8000/api/v1/users/create-student",
+          form,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+      }
+
+      await fetchStudents();
+
+      setStudentForm({
+        stu_id: null,
+        name: "",
+        email: "",
+        password: "",
+        phone: "",
+        classes: "",
+        dob: "",
+        address: "",
+        city: "",
+      });
+
+      document.getElementById("student-dialog").close();
+    } catch (err) {
+      console.error("Submit Error:", err);
+    }
   };
+
   const handleEdit = (student) => {
-    setStudentForm(student);
+  setStudentForm({
+    stu_id: student.id || student.stu_id,
+    name: student.name,
+    email: student.email,
+    password: student.password,
+    phone: student.phone,
+    classes: student.classes,
+    dob: student.dob,
+    address: student.address,
+    city: student.city,
+  });
+
+
     document.getElementById("student-dialog").showModal();
   };
+
   const handleDelete = (student) => {
     setDeleteStudent(student);
     document.getElementById("delete-student-dialog").showModal();
   };
-  const confirmDelete = () => {
-    setStudents(students.filter((s) => s.id !== deleteStudent.id));
-    setDeleteStudent(null);
-    document.getElementById("delete-student-dialog").close();
+
+  const confirmDelete = async () => {
+    const token = localStorage.getItem("token");
+
+    try {
+      await axios.delete(
+        "http://192.168.0.113:8000/api/v1/users/delete-student",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          data: {
+            stu_id: deleteStudent.stu_id,
+          },
+        },
+      );
+
+      setDeleteStudent(null);
+      document.getElementById("delete-student-dialog").close();
+    } catch (err) {
+      console.error("Delete Error:", err);
+    }
   };
+
+  const handleView = (student) => {
+    setViewStudent(student);
+    document.getElementById("view-student-dialog").showModal();
+  };
+
   const filteredStudents = students.filter((s) => {
     const matchesSearch =
       s.name.toLowerCase().includes(search.toLowerCase()) ||
       s.email.toLowerCase().includes(search.toLowerCase());
 
-    const matchesClass = classFilter ? s.class === classFilter : true;
+    const matchesClass = classFilter ? s.classes === classFilter : true;
 
     return matchesSearch && matchesClass;
   });
@@ -145,7 +177,8 @@ const Student = () => {
           style={{ padding: "20px", background: "#fff" }}
           onSubmit={handleSubmit}
         >
-          <h3>{form.id ? "Edit Student" : "Add Student"}</h3>
+          <h3>{form.stu_id ? "Edit Student" : "Add Student"}</h3>
+
           <input
             name="name"
             placeholder="Name"
@@ -169,9 +202,7 @@ const Student = () => {
             onChange={handleChange}
             required
           />
-          {errors.password && (
-            <span style={{ color: "red" }}>{errors.password}</span>
-          )}
+
           <input
             type="tel"
             name="phone"
@@ -220,7 +251,7 @@ const Student = () => {
             onChange={handleChange}
             required
           />
-          <button type="submit">{form.id ? "Update" : "Add"}</button>
+          <button type="submit">{form.stu_id ? "Update" : "Add"}</button>
           <button
             type="button"
             onClick={() => document.getElementById("student-dialog").close()}
@@ -298,9 +329,10 @@ const Student = () => {
       <table>
         <thead>
           <tr>
+            <th style={myStyle}>Student Id</th>
             <th style={myStyle}>Student Name</th>
             <th style={myStyle}>Student Email</th>
-            <th style={myStyle}>Phone phone</th>
+            <th style={myStyle}>Phone </th>
             <th style={myStyle}>Details</th>
             <th style={myStyle}>Action</th>
           </tr>
@@ -308,11 +340,11 @@ const Student = () => {
         <tbody>
           {filteredStudents.length > 0 ? (
             filteredStudents.map((s) => (
-              <tr key={s.id}>
+              <tr key={s.stu_id}>
+                <td>{s.stu_id}</td>
                 <td>{s.name}</td>
                 <td>{s.email}</td>
-                <td>{s.phone}</td>
-
+                <td>{s.phone}</td>  
                 <td>
                   <button
                     onClick={() => handleView(s)}

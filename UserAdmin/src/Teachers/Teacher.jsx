@@ -1,22 +1,20 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { IoMdCopy } from "react-icons/io";
 import { FaRegEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import DefaultLayout from "../layout/DefaultLayout";
 import { GiTeacher } from "react-icons/gi";
-import axios from "axios";
-const Teacher = () => {
-  const [teachers, setTeachers] = useState(
-    JSON.parse(localStorage.getItem("teachers")) || [],
-  );
 
+const Teacher = () => {
+  const [teachers, setTeachers] = useState([]);
   const [showPassword, setShowPassword] = useState({});
   const [deleteTeacher, setDeleteTeacher] = useState(null);
   const [searchTeacher, setSearchTeacher] = useState("");
 
   const [form, setForm] = useState({
-    id: null,
+    t_id: null,
     name: "",
     email: "",
     password: "",
@@ -24,9 +22,116 @@ const Teacher = () => {
     phone: "",
   });
 
+  const fetchTeachers = async () => {
+    const token = localStorage.getItem("token");
+
+    try {
+      const res = await axios.get(
+        "http://192.168.0.113:8000/api/v1/users/all-teachers",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      setTeachers(res.data.data || res.data);
+    } catch (err) {
+      console.error("GET ERROR:", err.response?.data || err);
+    }
+  };
+
   useEffect(() => {
-    localStorage.setItem("teachers", JSON.stringify(teachers));
-  }, [teachers]);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchTeachers();
+  }, []);
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handlePhoneChange = (e) => {
+    const value = e.target.value.replace(/\D/g, "").slice(0, 10);
+    setForm({ ...form, phone: value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem("token");
+    try {
+      if (form.t_id) {
+        await axios.put(
+          "http://192.168.0.113:8000/api/v1/users/update-teacher",
+          {
+            ...form,
+            id: form.t_id,
+          },
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        );
+      } else {
+        await axios.post(
+          "http://192.168.0.113:8000/api/v1/users/create-teacher",
+          form,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          },
+        );
+      } 
+      await fetchTeachers();
+
+      setForm({
+        t_id: null,
+        name: "",
+        email: "",
+        password: "",
+        qualification: "",
+        phone: "",
+      });
+
+      document.getElementById("teacher-dialog").close();
+    } catch (err) {
+      console.error("CREATE ERROR:", err.response?.data || err);
+    }
+  };
+
+  const handleEdit = (teacher) => {
+    setForm(teacher);
+    document.getElementById("teacher-dialog").showModal();
+  };
+
+  const handleDelete = (teacher) => {
+    setDeleteTeacher(teacher);
+    document.getElementById("delete-teacher-dialog").showModal();
+  };
+
+  const confirmDelete = async () => {
+    const token = localStorage.getItem("token");
+
+    try {
+      await axios.delete(
+        "http://192.168.0.113:8000/api/v1/users/delete-teacher",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          data: {
+            t_id: deleteTeacher?.t_id,
+          },
+        },
+      );
+
+      await fetchTeachers();
+
+      setDeleteTeacher(null);
+      document.getElementById("delete-teacher-dialog").close();
+    } catch (err) {
+      console.error("DELETE ERROR:", err.response?.data || err);
+    }
+  };
 
   const togglePassword = (id) => {
     setShowPassword((prev) => ({
@@ -40,80 +145,10 @@ const Teacher = () => {
     alert("Password copied!");
   };
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handlephoneChange = (e) => {
-    const value = e.target.value.replace(/\D/g, "").slice(0, 10);
-    setForm({ ...form, phone: value });
-  };
-
-  
-
- const handleSubmit = async (e) => {
-  e.preventDefault();
-  const token = localStorage.getItem("token");
-
-  try {
-    const res = await axios.post(
-      "http://192.168.0.113:8000/api/v1/users/create-teacher",
-      form,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    console.log("Response:", res.data);
-
-  
-    const newTeacher = {
-      ...form,
-      id: Date.now(), 
-    };
-
-    setTeachers((prev) => [...prev, newTeacher]);
-
-   
-    setForm({
-      id: null,
-      name: "",
-      email: "",
-      password: "",
-      qualification: "",
-      phone: "",
-    });
-
-    document.getElementById("teacher-dialog").close();
-
-  } catch (err) {
-    console.error("ERROR:", err.response?.data);
-  }
-};
-
-  const handleEdit = (teacher) => {
-    setForm(teacher);
-    document.getElementById("teacher-dialog").showModal();
-  };
-
-  const handleDelete = (teacher) => {
-    setDeleteTeacher(teacher);
-    document.getElementById("delete-teacher-dialog").showModal();
-  };
-
-  const confirmDelete = () => {
-    setTeachers(teachers.filter((s) => s.id !== deleteTeacher.id));
-    setDeleteTeacher(null);
-    document.getElementById("delete-teacher-dialog").close();
-  };
-
   const filteredTeacher = teachers.filter(
     (t) =>
-      t.name.toLowerCase().includes(searchTeacher.toLowerCase()) ||
-      t.email.includes(searchTeacher),
+      t?.name?.toLowerCase().includes(searchTeacher.toLowerCase()) ||
+      t?.email?.includes(searchTeacher),
   );
 
   return (
@@ -168,7 +203,7 @@ const Teacher = () => {
             name="phone"
             placeholder="phone."
             value={form.phone}
-            onChange={handlephoneChange}
+            onChange={handlePhoneChange}
             maxLength="10"
           />
 
@@ -182,7 +217,6 @@ const Teacher = () => {
           </button>
         </form>
       </dialog>
-
       <div className="flex mt-15 mb-12 items-center justify-between mr-40">
         <h3>Teacher List</h3>
         <div>
@@ -224,10 +258,10 @@ const Teacher = () => {
           </button>
         </div>
       </div>
-
       <table>
         <thead>
           <tr>
+            <th style={myStyle}>Teacher id</th>
             <th style={myStyle}>Teacher Name</th>
             <th style={myStyle}>Teacher Email</th>
             <th style={myStyle}>Password</th>
@@ -239,6 +273,7 @@ const Teacher = () => {
         <tbody>
           {filteredTeacher.map((t) => (
             <tr key={t.id}>
+              <td>{t.t_id}</td>
               <td>{t.name}</td>
               <td>{t.email}</td>
               <td style={{ display: "flex", alignItems: "center" }}>

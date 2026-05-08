@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { FcMoneyTransfer } from "react-icons/fc";
 import DefaultLayout from "../layout/DefaultLayout";
 import { GiMoneyStack } from "react-icons/gi";
-import { MdDone } from "react-icons/md";
 
 const Fees = () => {
   const [fees, setFees] = useState(
@@ -23,8 +22,8 @@ const Fees = () => {
     studentId: "",
     studentName: "",
     classes: "",
-    totalFee: "",
-    paid: " ",
+    totalFees: "",
+    paid: "",
     pending: "",
     status: "unpaid",
   });
@@ -37,78 +36,78 @@ const Fees = () => {
   }, [fees]);
 
   const getClassFee = (studentClass) => {
-    const match = classes.find((c) => {
-      const a = (c.className || "").trim().toLowerCase();
-      const b = (studentClass || "").trim().toLowerCase();
-      return a === b;
-    });
-
-    return Number(match?.fees || 0);
+    const match = classes.find(
+      (c) =>
+        (c.className || "").toLowerCase() ===
+        (studentClass || "").toLowerCase(),
+    );
+    return match?.fees || 0;
   };
 
   const handleStudentChange = (e) => {
     const studentId = e.target.value;
-    const selectedStudent = students.find((s) => s.id == studentId);
+    const selectedStudent = students.find(
+      (s) => String(s.id) === String(studentId),
+    );
+
     if (!selectedStudent) return;
 
     const fee = getClassFee(selectedStudent.classes);
-
     setForm({
-      ...form,
+      id: null,
       studentId: selectedStudent.id,
       studentName: selectedStudent.name,
       classes: selectedStudent.classes,
-      totalFee: fee,
-      paid: " ",
+      totalFees: fee,
+      paid: "",
       pending: fee,
       status: "unpaid",
     });
   };
 
   const handlePaidChange = (e) => {
-    const paid = Number(e.target.value || 0);
-    const pending = form.totalFee - paid;
+    const paid = Number(e.target.value) || 0;
+    const total = Number(form.totalFees) || 0;
+    const pending = total - paid;
 
     setForm({
       ...form,
       paid,
       pending: pending < 0 ? 0 : pending,
-      status: paid >= form.totalFee ? "paid" : "unpaid",
+      status: paid >= total ? "paid" : "unpaid",
     });
   };
 
   const handleSubmit = (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
+    const exists = fees.find((f) => f.studentId === form.studentId);
+    if (exists) {
+      alert("Fees already added for this student. Use Pay option.");
+      return;
+    }
 
-  const exists = fees.find((f) => f.studentId === form.studentId);
+    const newFee = {
+      ...form,
+      id: Date.now(),
+      date: new Date().toLocaleDateString(),
+    };
 
-  if (exists) {
-    alert("Fees already added for this student. Use Pay option.");
-    return;
-  }
+    setFees([...fees, newFee]);
 
-  const newFee = {
-    ...form,
-    id: Date.now(),
-    date: new Date().toLocaleDateString(),
+    setForm({
+      id: null,
+      studentId: "",
+      studentName: "",
+      classes: "",
+      totalFees: "",
+      paid: "",
+      pending: "",
+      status: "unpaid",
+    });
+
+    document.getElementById("fees-dialog").close();
   };
-
-  setFees([...fees, newFee]);
-
-  setForm({
-    id: null,
-    studentId: "",
-    studentName: "",
-    classes: "",
-    totalFee: "",
-    paid: " ",
-    pending: "",
-    status: "unpaid",
-  });
-
-  document.getElementById("fees-dialog").close();
-};
 
   const handlePay = (fee) => {
     setSelectedFee(fee);
@@ -119,7 +118,7 @@ const Fees = () => {
   const handlePaySubmit = (e) => {
     e.preventDefault();
 
-    const amount = Number(payAmount || 0);
+    const amount = Number(payAmount) || 0;
 
     if (amount <= 0) {
       alert("Enter valid amount");
@@ -134,13 +133,13 @@ const Fees = () => {
     const updated = fees.map((f) => {
       if (f.id === selectedFee.id) {
         const newPaid = Number(f.paid) + amount;
-        const newPending = f.totalFee - newPaid;
+        const newPending = f.totalFees - newPaid;
 
         return {
           ...f,
           paid: newPaid,
           pending: newPending < 0 ? 0 : newPending,
-          status: newPaid >= f.totalFee ? "paid" : "unpaid",
+          status: newPaid >= f.totalFees ? "paid" : "unpaid",
         };
       }
       return f;
@@ -222,7 +221,7 @@ const Fees = () => {
               <tr key={f.id}>
                 <td>{f.studentName}</td>
                 <td>{f.classes}</td>
-                <td>₹{f.totalFee}</td>
+                <td>₹{f.totalFees}</td>
                 <td>₹{f.paid}</td>
                 <td>₹{f.pending}</td>
                 <td>
@@ -240,19 +239,26 @@ const Fees = () => {
                 <td>
                   {f.status === "unpaid" ? (
                     <button
-                      style={{ background: "#023020", fontWeight: "600",textAlign:"center"  }}
+                      style={{
+                        background: "#023020",
+                        fontWeight: "600",
+                        textAlign: "center",
+                      }}
                       onClick={() => handlePay(f)}
                     >
-                      {" "}
                       <GiMoneyStack /> Pay
                     </button>
-                  ):(
+                  ) : (
                     <button
-                      style={{ color:"green", background: "transparent",border:"none", fontWeight: "600",fontSize:"1.1rem"}}
-                      
+                      style={{
+                        color: "green",
+                        background: "transparent",
+                        border: "none",
+                        fontWeight: "600",
+                        fontSize: "1.1rem",
+                      }}
                     >
-                      {" "}
-                       Done
+                      Done
                     </button>
                   )}
                 </td>
@@ -268,6 +274,7 @@ const Fees = () => {
         </tbody>
       </table>
 
+      {/* ADD FEES DIALOG */}
       <dialog id="fees-dialog">
         <form style={{ padding: "30px" }} onSubmit={handleSubmit}>
           <h3>Add Fees</h3>
@@ -282,10 +289,10 @@ const Fees = () => {
           </select>
 
           <input value={form.classes} disabled placeholder="Class" />
-          <input value={form.totalFee} disabled placeholder="Total Fee" />
+          <input value={form.totalFees} disabled placeholder="Total Fee" />
 
           <input
-            type="number"
+            type="text"
             value={form.paid}
             onChange={handlePaidChange}
             placeholder="Paid Amount"
@@ -293,12 +300,10 @@ const Fees = () => {
 
           <input value={form.pending} disabled placeholder="Pending Fees" />
 
-          <button
-            style={{ marginRight: "310px", background: "green" }}
-            type="submit"
-          >
+          <button style={{ marginRight: "310px", background: "green" }} type="submit">
             Save
           </button>
+
           <button
             style={{ background: "#550000" }}
             type="button"
@@ -309,15 +314,15 @@ const Fees = () => {
         </form>
       </dialog>
 
+      {/* PAY DIALOG */}
       <dialog id="pay-dialog">
         <form style={{ padding: "20px" }} onSubmit={handlePaySubmit}>
-          <h3 className="text-center mt-3"> Pay Fees</h3>
-
+          <h3 className="text-center mt-3">Pay Fees</h3>
           <p style={{ border: "1px solid black", padding: "10px" }}>
             Student: {selectedFee?.studentName}
           </p>
           <p style={{ border: "1px solid black", padding: "10px" }}>
-            Total Fee: ₹{selectedFee?.totalFee}
+            Total Fee: ₹{selectedFee?.totalFees}
           </p>
           <p style={{ border: "1px solid black", padding: "10px" }}>
             Paid: ₹{selectedFee?.paid}
@@ -325,27 +330,20 @@ const Fees = () => {
           <p style={{ border: "1px solid black", padding: "10px" }}>
             Pending: ₹{selectedFee?.pending}
           </p>
-
           <input
             style={{ border: "1px solid black", padding: "10px" }}
-            type="number"
+            type="text"
             value={payAmount}
             onChange={(e) => setPayAmount(e.target.value)}
             placeholder="Enter Amount"
             required
           />
 
-          <button
-            style={{ marginRight: "310px", background: "#023020" }}
-            type="submit"
-          >
-            {" "}
+          <button style={{ marginRight: "310px", background: "#023020" }} type="submit">
             <GiMoneyStack /> Pay
           </button>
-          <button
-            type="button"
-            onClick={() => document.getElementById("pay-dialog").close()}
-          >
+
+          <button type="button" onClick={() => document.getElementById("pay-dialog").close()}>
             Cancel
           </button>
         </form>
